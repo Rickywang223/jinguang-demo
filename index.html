@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>云砺 · 客户场景 Demo Gallery</title>
+<link rel="stylesheet" href="shared/style.css" />
+<style>
+.hero { padding: 56px 0 32px; }
+.hero-title {
+  font-size: 32px; font-weight: 600;
+  color: var(--ink-1); letter-spacing: -0.5px;
+  margin-bottom: 12px;
+}
+.hero-title .accent { color: var(--brass); }
+.hero-sub {
+  font-size: 16px; color: var(--ink-2);
+  max-width: 720px; line-height: 1.7;
+}
+.hero-stats { margin-top: 28px; display: flex; gap: 36px; }
+.stat { display: flex; flex-direction: column; }
+.stat-num { font-size: 26px; font-weight: 600; color: var(--ink-1); letter-spacing: -0.5px; }
+.stat-label { font-size: 12px; color: var(--ink-3); margin-top: 2px; }
+
+.toolbar {
+  padding: 0 0 24px;
+  display: flex; gap: 12px; align-items: center;
+}
+.search { flex: 1; max-width: 360px; position: relative; }
+.search input {
+  width: 100%; height: 38px;
+  padding: 0 14px 0 38px;
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  background: var(--paper);
+  font-size: 13px; color: var(--ink-1);
+  outline: none; transition: border-color 0.15s;
+}
+.search input:focus { border-color: var(--ink-1); }
+.search::before {
+  content: "🔍"; position: absolute;
+  left: 12px; top: 50%; transform: translateY(-50%);
+  font-size: 14px; opacity: 0.5;
+}
+.filter-chips { display: flex; gap: 6px; flex-wrap: wrap; }
+.chip {
+  padding: 6px 12px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  font-size: 12px; color: var(--ink-2);
+  cursor: pointer; background: var(--paper);
+  transition: all 0.15s;
+}
+.chip:hover { border-color: var(--ink-2); color: var(--ink-1); }
+.chip.active {
+  background: var(--ink-1); color: var(--paper);
+  border-color: var(--ink-1);
+}
+
+.gallery { padding-bottom: 80px; }
+.client-section { margin-bottom: 36px; }
+.client-header {
+  display: flex; align-items: baseline; gap: 14px;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--line-2);
+}
+.client-name { font-size: 18px; font-weight: 600; color: var(--ink-1); }
+.client-meta {
+  font-size: 12px; color: var(--ink-3);
+  display: flex; gap: 12px;
+}
+.client-meta span::before { content: "·"; margin-right: 6px; }
+.client-meta span:first-child::before { content: ""; margin: 0; }
+
+.demo-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 16px;
+}
+
+/* 大型 Demo 卡片 —— 金光这种"多场景综合页"用宽卡 */
+.demo-card-large {
+  grid-column: 1 / -1;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  padding: 24px;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-decoration: none;
+  color: inherit;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 24px;
+  align-items: center;
+}
+.demo-card-large:hover {
+  border-color: var(--ink-1);
+  box-shadow: var(--shadow-hover);
+  transform: translateY(-1px);
+}
+.demo-card-large:hover .demo-arrow { color: var(--brass); }
+
+.demo-card-large .demo-icon {
+  width: 64px; height: 64px;
+  border-radius: var(--r);
+  background: var(--ink-1);
+  color: var(--brass-2);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 28px;
+}
+.demo-card-large .demo-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--ink-1);
+  margin-bottom: 6px;
+}
+.demo-card-large .demo-desc {
+  font-size: 13px;
+  color: var(--ink-2);
+  margin-bottom: 12px;
+}
+.demo-card-large .scene-list {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.scene-tag {
+  font-size: 11px;
+  padding: 4px 10px;
+  border-radius: 12px;
+  background: var(--line-2);
+  color: var(--ink-2);
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* 标准小卡（其他客户）*/
+.demo-card {
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  padding: 20px;
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+  display: flex; flex-direction: column; gap: 12px;
+  min-height: 180px;
+  text-decoration: none;
+  color: inherit;
+}
+.demo-card:hover {
+  border-color: var(--ink-1);
+  box-shadow: var(--shadow-hover);
+  transform: translateY(-1px);
+}
+.demo-card:hover .demo-arrow { color: var(--brass); }
+
+.demo-top {
+  display: flex; align-items: flex-start; justify-content: space-between; gap: 8px;
+}
+.demo-icon {
+  width: 36px; height: 36px;
+  border-radius: var(--r-sm);
+  background: var(--line-2);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px; flex-shrink: 0;
+}
+.demo-title { font-size: 15px; font-weight: 600; color: var(--ink-1); line-height: 1.4; }
+.demo-desc { font-size: 12px; color: var(--ink-2); line-height: 1.5; flex: 1; }
+.demo-meta {
+  display: flex; justify-content: space-between; align-items: center;
+  padding-top: 10px;
+  border-top: 1px solid var(--line-2);
+  font-size: 11px; color: var(--ink-3);
+}
+.demo-arrow { color: var(--ink-3); transition: color 0.15s; font-size: 14px; }
+
+.demo-add {
+  background: var(--canvas);
+  border: 1px dashed var(--line);
+  color: var(--ink-3);
+  display: flex; align-items: center; justify-content: center;
+  flex-direction: column; gap: 6px;
+  font-size: 13px;
+}
+.demo-add:hover {
+  border-color: var(--ink-2); color: var(--ink-1);
+  background: var(--paper);
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="brand">
+      <div class="brand-logo">云砺</div>
+      <div class="brand-text">
+        <span class="brand-title">客户场景 Demo Gallery</span>
+        <span class="brand-sub">多客户 × 多场景 定制演示导航</span>
+      </div>
+    </div>
+    <div class="header-meta">
+      <span class="pill">xforceplus · 云升 Yunrise</span>
+      <span class="pill">v0.1 · 2026-09</span>
+    </div>
+  </div>
+</header>
+
+<div class="container">
+
+  <section class="hero">
+    <h1 class="hero-title">为每个客户，<span class="accent">单独设计</span>的 AI Demo。</h1>
+    <p class="hero-sub">基于云砺/云升的真实业务能力，针对不同客户场景定制 Demo 演示。从财税到供应链，从单店到集团，每个客户的真实问题配一个能直接演示的 AI 解决方案。</p>
+    <div class="hero-stats">
+      <div class="stat"><span class="stat-num">1</span><span class="stat-label">综合 Demo</span></div>
+      <div class="stat"><span class="stat-num">3</span><span class="stat-label">参赛场景</span></div>
+      <div class="stat"><span class="stat-num">7</span><span class="stat-label">覆盖客户</span></div>
+      <div class="stat"><span class="stat-num">3</span><span class="stat-label">行业</span></div>
+    </div>
+  </section>
+
+  <div class="toolbar">
+    <div class="search"><input type="text" placeholder="搜索客户名 / Demo 名 / 行业" /></div>
+    <div class="filter-chips">
+      <span class="chip active">全部</span>
+      <span class="chip">造纸/快消</span>
+      <span class="chip">地产</span>
+      <span class="chip">餐饮连锁</span>
+      <span class="chip">零售</span>
+      <span class="chip">医药</span>
+    </div>
+  </div>
+
+  <div class="gallery">
+
+    <!-- 金光：1张大卡 + 三个场景标签 -->
+    <section class="client-section" data-industry="造纸/快消">
+      <div class="client-header">
+        <span class="client-name">金光集团（金红叶）</span>
+        <div class="client-meta">
+          <span>造纸 · 经销商管理</span>
+          <span>1 个综合 Demo · 3 个场景</span>
+        </div>
+      </div>
+      <div class="demo-grid">
+
+        <a class="demo-card-large" href="demos/jinguang.html">
+          <div class="demo-icon">金</div>
+          <div>
+            <div class="demo-title">金光 · 基础财会优化</div>
+            <div class="demo-desc">客户主数据补全 → 自动开票 → 风险监控 → 经营驾驶舱。AI 智能体全程接管基础财会作业，覆盖客户全链路。</div>
+            <div class="scene-list">
+              <span class="scene-tag">⚡ 智能开票</span>
+              <span class="scene-tag">🛡 风险监控</span>
+              <span class="scene-tag">📊 经营驾驶舱</span>
+            </div>
+          </div>
+          <span class="demo-arrow" style="font-size: 18px;">→</span>
+        </a>
+
+      </div>
+    </section>
+
+    <!-- 凯德：占位卡 -->
+    <section class="client-section" data-industry="地产">
+      <div class="client-header">
+        <span class="client-name">凯德集团 (capitaland)</span>
+        <div class="client-meta">
+          <span>地产 · 项目公司管理</span>
+          <span>0 个 Demo</span>
+        </div>
+      </div>
+      <div class="demo-grid">
+        <div class="demo-card demo-add" onclick="alert('模板：新增客户 Demo\n\n该卡片用于快速复制出新客户 Demo 骨架。')">
+          <div style="font-size: 22px;">＋</div>
+          <div>新增客户 Demo</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 麦当劳/汉堡王：占位卡 -->
+    <section class="client-section" data-industry="餐饮连锁">
+      <div class="client-header">
+        <span class="client-name">麦当劳 / 汉堡王</span>
+        <div class="client-meta">
+          <span>餐饮连锁 · 600+门店</span>
+          <span>0 个 Demo</span>
+        </div>
+      </div>
+      <div class="demo-grid">
+        <div class="demo-card demo-add" onclick="alert('模板：新增客户 Demo\n\n该卡片用于快速复制出新客户 Demo 骨架。')">
+          <div style="font-size: 22px;">＋</div>
+          <div>新增客户 Demo</div>
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+</div>
+
+<footer>
+  <div>云砺（xforceplus.com） · 云升 Yunrise 企业智能底座</div>
+  <div style="margin-top: 4px;">© 2026 · 内部演示用 · v0.1</div>
+</footer>
+
+<script>
+document.querySelectorAll('.chip').forEach(chip => {
+  chip.addEventListener('click', () => {
+    document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+    chip.classList.add('active');
+  });
+});
+</script>
+
+</body>
+</html>

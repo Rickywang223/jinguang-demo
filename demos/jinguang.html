@@ -1,0 +1,2677 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>金光集团 · 基础财会优化 Demo</title>
+<link rel="stylesheet" href="../shared/style.css" />
+<style>
+/* ========== 左右分栏布局 ========== */
+.demo-layout {
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  height: calc(100vh - 0px);
+  background: var(--canvas);
+}
+
+/* ===== 左侧栏 ===== */
+.demo-sidebar {
+  background: var(--paper);
+  border-right: 1px solid var(--line);
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  padding: 0 22px;
+}
+.sidebar-brand {
+  padding: 16px 0;
+  border-bottom: 1px solid var(--line-2);
+  display: flex; align-items: center; gap: 10px;
+}
+.sidebar-brand-icon {
+  width: 32px; height: 32px;
+  background: var(--ink-1);
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--brass);
+  font-size: 11px; font-weight: 700;
+  letter-spacing: -0.5px;
+}
+.sidebar-brand-text { display: flex; flex-direction: column; line-height: 1.2; }
+.sidebar-brand-name { font-size: 13px; font-weight: 600; color: var(--ink-1); }
+.sidebar-brand-sub { font-size: 10px; color: var(--ink-3); margin-top: 1px; }
+
+.workspace-shortcuts {
+  padding: 10px 0 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+.shortcut-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 12px;
+  border-radius: var(--r);
+  font-size: 12px;
+  color: var(--ink-2);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.shortcut-item:hover {
+  background: var(--canvas);
+  color: var(--ink-1);
+}
+.shortcut-icon {
+  width: 16px;
+  text-align: center;
+  font-size: 13px;
+  color: var(--ink-3);
+  flex-shrink: 0;
+}
+.shortcut-item:hover .shortcut-icon { color: var(--ink-1); }
+.shortcut-text {
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.shortcut-kbd {
+  font-size: 10px;
+  color: var(--ink-3);
+  padding: 1px 5px;
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  background: var(--paper);
+  flex-shrink: 0;
+}
+
+/* 工作台子切换：历史对话 / 定时任务 */
+.sidebar-subsection { padding: 8px 0 0; }
+.subsection-tabs {
+  display: flex;
+  gap: 0;
+  border-bottom: 1px solid var(--line-2);
+  margin-bottom: 6px;
+}
+.sub-tab {
+  flex: 1;
+  padding: 6px 0;
+  font-size: 11px;
+  color: var(--ink-3);
+  text-align: center;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+}
+.sub-tab:hover { color: var(--ink-2); }
+.sub-tab.active {
+  color: var(--ink-1);
+  font-weight: 600;
+  border-bottom-color: var(--ink-1);
+}
+.sub-tab-panel { display: flex; flex-direction: column; gap: 1px; }
+.sub-tab-panel:not(.active) { display: none; }
+.sub-tab-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 8px;
+  border-radius: var(--r-sm);
+  font-size: 11px;
+  color: var(--ink-2);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.sub-tab-item:hover { background: var(--canvas); color: var(--ink-1); }
+.sub-tab-icon {
+  font-size: 12px;
+  width: 14px;
+  text-align: center;
+  flex-shrink: 0;
+}
+.sub-tab-item > span:nth-child(2) {
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.sub-tab-time {
+  font-size: 10px;
+  color: var(--ink-3);
+  flex-shrink: 0;
+}
+
+.sidebar-mode {
+  padding: 12px 0 8px;
+  display: flex; gap: 4px;
+  background: transparent;
+  border-bottom: 1px solid var(--line-2);
+  margin-bottom: 4px;
+}
+.mode-btn {
+  flex: 1;
+  padding: 6px 0;
+  font-size: 12px;
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  border-radius: 0;
+  cursor: pointer;
+  color: var(--ink-3);
+  text-align: center;
+  font-weight: 500;
+}
+.mode-btn.active {
+  background: transparent;
+  border-bottom-color: var(--ink-1);
+  color: var(--ink-1);
+  font-weight: 600;
+}
+
+.sidebar-section {
+  padding: 14px 0 6px;
+  font-size: 10px;
+  color: var(--ink-3);
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+.agent-list {
+  padding: 0 8px;
+  display: flex; flex-direction: column; gap: 2px;
+}
+.agent-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 8px;
+  border-radius: var(--r);
+  cursor: pointer;
+  transition: all 0.15s;
+  position: relative;
+}
+.agent-item:hover { background: var(--canvas); }
+.agent-item.active {
+  background: var(--line-2);
+}
+.agent-item.active::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 8px; bottom: 8px;
+  width: 3px;
+  background: var(--ink-1);
+  border-radius: 0 2px 2px 0;
+}
+.agent-item-icon {
+  width: 32px; height: 32px;
+  border-radius: var(--r-sm);
+  background: var(--canvas);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px;
+  flex-shrink: 0;
+}
+.agent-item-info { flex: 1; min-width: 0; }
+.agent-item-name {
+  font-size: 12px; font-weight: 600;
+  color: var(--ink-1);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.agent-item-sub {
+  font-size: 10px;
+  color: var(--ink-3);
+  margin-top: 1px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sidebar-tool-list {
+  padding: 0 8px;
+  margin-top: auto;
+  display: flex; flex-direction: column; gap: 2px;
+}
+.tool-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 8px 8px;
+  border-radius: var(--r);
+  cursor: pointer;
+  font-size: 12px;
+  color: var(--ink-2);
+  transition: all 0.15s;
+}
+.tool-item:hover { background: var(--canvas); color: var(--ink-1); }
+.tool-item-icon {
+  font-size: 14px;
+  width: 18px;
+  text-align: center;
+}
+
+.sidebar-user {
+  padding: 14px 0;
+  border-top: 1px solid var(--line-2);
+  display: flex; align-items: center; gap: 10px;
+  background: var(--canvas);
+}
+.sidebar-user-avatar {
+  width: 28px; height: 28px;
+  border-radius: 14px;
+  background: var(--ink-1);
+  color: var(--paper);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 600;
+}
+.sidebar-user-info { flex: 1; line-height: 1.2; }
+.sidebar-user-name { font-size: 12px; color: var(--ink-1); font-weight: 500; }
+.sidebar-user-role { font-size: 10px; color: var(--ink-3); margin-top: 1px; }
+
+/* ===== 右侧主区域 ===== */
+.demo-main {
+  display: flex; flex-direction: column;
+  overflow: hidden;
+  background: var(--canvas);
+}
+
+.main-toolbar {
+  background: var(--paper);
+  border-bottom: 1px solid var(--line);
+  padding: 12px 24px;
+  display: flex; align-items: center; justify-content: space-between;
+  flex-shrink: 0;
+}
+.main-toolbar-left { display: flex; align-items: center; gap: 12px; }
+.main-toolbar-back {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 12px; color: var(--ink-2);
+  cursor: pointer; padding: 5px 10px;
+  border-radius: var(--r-sm);
+  border: 1px solid var(--line);
+  background: var(--paper);
+  text-decoration: none;
+}
+.main-toolbar-back:hover { color: var(--ink-1); border-color: var(--ink-1); }
+.main-toolbar-title {
+  font-size: 14px; font-weight: 600; color: var(--ink-1);
+}
+.main-toolbar-title .accent { color: var(--brass); }
+.main-toolbar-meta {
+  font-size: 11px; color: var(--ink-3);
+  display: flex; gap: 8px;
+  align-items: center;
+}
+
+.main-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px 24px;
+}
+
+/* 视图面板容器 */
+.agent-panel, .view-panel { display: none; }
+.agent-panel.active, .view-panel.active { display: block; animation: fade 0.2s; }
+.views-container { display: contents; }
+@keyframes fade { from { opacity: 0; } to { opacity: 1; } }
+
+/* 智能体状态卡（驾驶舱核心） */
+.agent-card {
+  background: linear-gradient(135deg, #1a1f2e 0%, #2a3142 100%);
+  color: var(--paper);
+  border-radius: var(--r-lg);
+  padding: 20px 24px;
+  margin-bottom: 16px;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 20px;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+}
+.agent-card::before {
+  content: '';
+  position: absolute; top: 0; right: 0;
+  width: 200px; height: 100%;
+  background: radial-gradient(circle at top right, rgba(242,178,51,0.08), transparent 60%);
+  pointer-events: none;
+}
+.agent-avatar {
+  width: 56px; height: 56px;
+  border-radius: var(--r-lg);
+  background: rgba(0,0,0,0.3);
+  border: 1px solid rgba(242,178,51,0.3);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  color: var(--brass); font-size: 14px; font-weight: 700;
+  flex-shrink: 0; position: relative; z-index: 1;
+}
+.agent-avatar-sub {
+  font-size: 8px; color: rgba(242,178,51,0.6);
+  letter-spacing: 1px; margin-top: 2px;
+}
+.agent-info { position: relative; z-index: 1; min-width: 0; }
+.agent-status-row {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 11px; color: rgba(255,255,255,0.7);
+  margin-bottom: 4px;
+}
+.agent-pulse {
+  width: 7px; height: 7px; border-radius: 4px;
+  background: #2e9e5b;
+  animation: pulse 2s infinite;
+}
+@keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
+.agent-name { font-size: 18px; font-weight: 600; color: var(--paper); margin-bottom: 3px; }
+.agent-desc { font-size: 11px; color: rgba(255,255,255,0.6); line-height: 1.5; }
+.agent-progress {
+  position: relative; z-index: 1;
+  min-width: 240px;
+}
+.agent-progress-label {
+  font-size: 10px; color: rgba(255,255,255,0.6);
+  margin-bottom: 5px;
+  display: flex; justify-content: space-between;
+}
+.agent-progress-label b {
+  color: var(--brass); font-weight: 600; font-size: 13px;
+}
+.agent-progress-bar {
+  height: 5px; background: rgba(255,255,255,0.1);
+  border-radius: 3px; overflow: hidden; margin-bottom: 10px;
+}
+.agent-progress-bar-fill { height: 100%; background: var(--brass); border-radius: 3px; }
+.agent-subtasks { display: flex; flex-direction: column; gap: 3px; }
+.agent-subtask {
+  font-size: 10px; color: rgba(255,255,255,0.7);
+  display: flex; align-items: center; gap: 5px;
+}
+.agent-subtask-dot {
+  width: 5px; height: 5px; border-radius: 3px;
+  background: rgba(255,255,255,0.4); flex-shrink: 0;
+}
+.agent-subtask-dot.done { background: #2e9e5b; }
+.agent-subtask-dot.doing { background: var(--brass); }
+.agent-subtask-dot.todo { background: rgba(255,255,255,0.2); }
+
+/* 4 KPI */
+.kpi-bar {
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  gap: 10px; margin-bottom: 16px;
+}
+.kpi-card {
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  padding: 12px 16px;
+  transition: all 0.15s; cursor: pointer;
+}
+.kpi-card:hover { box-shadow: var(--shadow); }
+.kpi-card .label {
+  font-size: 10px; color: var(--ink-3); margin-bottom: 5px;
+  display: flex; align-items: center; gap: 4px;
+}
+.kpi-card .value {
+  font-size: 20px; font-weight: 600; color: var(--ink-1); letter-spacing: -0.5px;
+}
+.kpi-card .foot {
+  font-size: 10px; color: var(--ink-3); margin-top: 3px;
+}
+.kpi-card .foot .danger { color: #b9342c; font-weight: 500; }
+.kpi-card .foot .good { color: var(--live); font-weight: 500; }
+
+/* 事件流 */
+.events {
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  padding: 16px 20px;
+  margin-bottom: 16px;
+}
+.events-header {
+  display: flex; justify-content: space-between; align-items: flex-start;
+  margin-bottom: 12px;
+}
+.events-title { font-size: 14px; font-weight: 600; color: var(--ink-1); }
+.events-desc { font-size: 11px; color: var(--ink-3); margin-top: 3px; }
+.events-summary { display: flex; gap: 8px; font-size: 10px; }
+.events-summary span {
+  padding: 3px 8px; border-radius: 10px;
+  border: 1px solid var(--line); background: var(--canvas);
+}
+
+.event-card {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--line-2);
+  align-items: center;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.event-card:hover { background: var(--canvas); }
+.event-card:last-child { border-bottom: none; }
+.event-rank {
+  width: 36px; height: 36px;
+  border-radius: 6px;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  font-weight: 700; flex-shrink: 0; font-size: 11px;
+  border: 1.5px solid;
+}
+.event-rank.red    { border-color: #b9342c; background: #fbe9e6; color: #b9342c; }
+.event-rank.orange { border-color: var(--brass); background: var(--brass-2); color: var(--brass); }
+.event-rank.green  { border-color: var(--live); background: #eaf3ee; color: var(--live); }
+.event-rank-num { font-size: 14px; line-height: 1; }
+.event-rank-label { font-size: 8px; margin-top: 2px; letter-spacing: 0.3px; }
+
+.event-content { min-width: 0; }
+.event-title {
+  font-size: 13px; font-weight: 600; color: var(--ink-1);
+  margin-bottom: 3px; display: flex; align-items: center; gap: 6px;
+}
+.event-tag {
+  font-size: 9px; padding: 1px 7px;
+  border-radius: 10px; font-weight: 600;
+}
+.event-tag.billing { background: #fbe9e6; color: #b9342c; }
+.event-tag.risk    { background: var(--brass-2); color: var(--brass); }
+.event-tag.kpi     { background: #eaf3ee; color: var(--live); }
+.event-meta {
+  font-size: 10px; color: var(--ink-3);
+  display: flex; flex-wrap: wrap; gap: 8px;
+}
+.event-meta b { color: var(--ink-1); font-weight: 600; }
+.event-loss { font-size: 10px; color: var(--ink-3); margin-top: 3px; }
+.event-loss .danger { color: #b9342c; font-weight: 500; }
+.event-loss .up { color: var(--live); font-weight: 500; }
+
+.event-actions {
+  display: flex; flex-direction: column; gap: 4px; min-width: 100px;
+}
+.btn-primary {
+  height: 28px; padding: 0 12px;
+  border-radius: var(--r-sm);
+  background: var(--ink-1); color: var(--paper);
+  border: 1px solid var(--ink-1);
+  font-size: 11px; font-weight: 500;
+  cursor: pointer; transition: all 0.15s;
+}
+.btn-primary:hover { background: #000; }
+.btn-ghost {
+  height: 26px; padding: 0 10px;
+  border-radius: var(--r-sm);
+  background: var(--paper); color: var(--ink-2);
+  border: 1px solid var(--line); font-size: 11px; cursor: pointer;
+}
+.btn-ghost:hover { border-color: var(--ink-1); color: var(--ink-1); }
+
+/* AI 智能建议 */
+.smart-suggest {
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  padding: 16px 18px;
+}
+.smart-suggest-header {
+  display: flex; align-items: center; gap: 8px; margin-bottom: 12px;
+}
+.smart-suggest-icon { font-size: 14px; }
+.smart-suggest-title { font-size: 13px; font-weight: 600; color: var(--ink-1); }
+.smart-suggest-list { display: flex; flex-direction: column; gap: 6px; }
+.suggest-item {
+  background: var(--canvas);
+  border: 1px solid var(--line-2);
+  border-radius: var(--r);
+  padding: 10px 12px;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 12px; align-items: center;
+}
+.suggest-num {
+  width: 20px; height: 20px;
+  border-radius: 10px;
+  background: var(--ink-1); color: var(--paper);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 10px; font-weight: 600; flex-shrink: 0;
+}
+.suggest-text { font-size: 11px; color: var(--ink-2); line-height: 1.5; }
+.suggest-text b { color: var(--ink-1); font-weight: 600; }
+.suggest-actions { display: flex; gap: 4px; }
+
+/* AI 依据 Modal */
+.modal-mask {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.4);
+  z-index: 100;
+  display: none;
+  align-items: center;
+  justify-content: center;
+}
+.modal-mask.open { display: flex; animation: mask-in 0.2s; }
+@keyframes mask-in { from { opacity: 0; } to { opacity: 1; } }
+.modal {
+  background: var(--paper);
+  border-radius: var(--r-lg);
+  width: 720px;
+  max-height: 80vh;
+  display: flex; flex-direction: column;
+  overflow: hidden;
+}
+.modal-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--line-2);
+  display: flex; justify-content: space-between; align-items: flex-start;
+}
+.modal-title { font-size: 14px; font-weight: 600; color: var(--ink-1); }
+.modal-sub { font-size: 11px; color: var(--ink-3); margin-top: 3px; }
+.modal-close {
+  width: 28px; height: 28px;
+  border-radius: var(--r-sm);
+  background: transparent;
+  border: 1px solid var(--line);
+  color: var(--ink-2);
+  cursor: pointer; font-size: 14px;
+  display: flex; align-items: center; justify-content: center;
+}
+.modal-body { padding: 16px 20px; overflow-y: auto; flex: 1; }
+.evidence-summary {
+  background: var(--canvas); border-radius: var(--r);
+  padding: 12px 14px; margin-bottom: 12px;
+}
+.evidence-summary-title {
+  font-size: 11px; font-weight: 600; color: var(--ink-3);
+  letter-spacing: 0.3px; margin-bottom: 6px;
+}
+.evidence-summary-text {
+  font-size: 12px; color: var(--ink-1);
+  line-height: 1.6; margin-bottom: 8px;
+}
+.evidence-confidence {
+  display: flex; align-items: center; gap: 8px; font-size: 10px;
+}
+.confidence-tag {
+  padding: 2px 8px; border-radius: 10px;
+  background: #eaf3ee; color: var(--live); font-weight: 600;
+}
+.confidence-bar { flex: 1; height: 4px; background: var(--line-2); border-radius: 2px; overflow: hidden; }
+.confidence-bar-fill { height: 100%; background: var(--live); border-radius: 2px; }
+
+.evidence-chain { margin-bottom: 12px; }
+.evidence-chain-title {
+  font-size: 11px; font-weight: 600; color: var(--ink-3);
+  letter-spacing: 0.3px; margin-bottom: 8px;
+}
+.evidence-step {
+  display: grid; grid-template-columns: auto 1fr; gap: 10px;
+  padding: 8px 10px; background: var(--canvas);
+  border-radius: var(--r); margin-bottom: 5px; font-size: 11px;
+}
+.evidence-step-num {
+  width: 20px; height: 20px;
+  border-radius: 10px;
+  background: var(--paper); border: 1px solid var(--line);
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 600; color: var(--ink-2);
+  font-size: 10px; flex-shrink: 0;
+}
+.evidence-step-content .label { font-weight: 600; color: var(--ink-1); margin-bottom: 1px; }
+.evidence-step-content .detail { color: var(--ink-3); font-size: 10px; }
+
+.evidence-sources { display: flex; flex-wrap: wrap; gap: 4px; }
+.source-chip {
+  font-size: 10px; padding: 2px 7px;
+  background: var(--canvas);
+  border: 1px solid var(--line);
+  border-radius: 10px; color: var(--ink-2);
+}
+.evidence-related {
+  margin-top: 10px; padding: 8px 10px;
+  background: var(--canvas); border-radius: var(--r);
+  font-size: 10px; color: var(--ink-3);
+}
+
+.modal-footer {
+  padding: 12px 20px;
+  border-top: 1px solid var(--line-2);
+  display: flex; justify-content: flex-end; gap: 6px;
+}
+.btn-cancel {
+  height: 32px; padding: 0 14px;
+  border-radius: var(--r);
+  background: var(--paper);
+  border: 1px solid var(--line);
+  color: var(--ink-2);
+  cursor: pointer; font-size: 12px;
+}
+.btn-cancel:hover { border-color: var(--ink-1); color: var(--ink-1); }
+</style>
+</head>
+<body>
+
+<div class="container" style="padding: 0; max-width: none;">
+
+<div class="demo-layout">
+
+  <!-- ===== 左侧栏 ===== -->
+  <aside class="demo-sidebar">
+    <div class="sidebar-brand">
+      <div class="sidebar-brand-icon">AI</div>
+      <div class="sidebar-brand-text">
+        <span class="sidebar-brand-name">金光 AI 财</span>
+        <span class="sidebar-brand-sub">基础财会优化 · 驾驶舱</span>
+      </div>
+    </div>
+
+    <div class="sidebar-mode">
+      <div class="mode-btn active" data-mode="work">工作台</div>
+      <div class="mode-btn" data-mode="agent">智能体</div>
+    </div>
+
+    <div class="workspace-shortcuts" data-mode-content="work">
+      <div class="shortcut-item" data-view="new-task"><span class="shortcut-icon">＋</span><span class="shortcut-text">新任务</span><span class="shortcut-kbd">⌘N</span></div>
+      <div class="shortcut-item" data-view="skill"><span class="shortcut-icon">🧩</span><span class="shortcut-text">技能</span></div>
+      <div class="shortcut-item" data-view="data-board"><span class="shortcut-icon">📊</span><span class="shortcut-text">数据看板</span></div>
+    </div>
+
+    <!-- 工作台子切换：历史对话 / 定时任务 -->
+    <div class="sidebar-subsection">
+      <div class="subsection-tabs" data-mode-content="work">
+        <div class="sub-tab active" data-subtab="history">历史对话</div>
+        <div class="sub-tab" data-subtab="schedule">定时任务</div>
+      </div>
+      <div class="sub-tab-panel active" data-subpanel="history" data-mode-content="work">
+        <div class="sub-tab-item" data-view="history-1"><span class="sub-tab-icon">💬</span><span>上海永胜 · 主数据确认</span><span class="sub-tab-time">14:32</span></div>
+        <div class="sub-tab-item" data-view="history-2"><span class="sub-tab-icon">💬</span><span>浙江光华 · 风险处置</span><span class="sub-tab-time">13:18</span></div>
+        <div class="sub-tab-item" data-view="history-3"><span class="sub-tab-icon">💬</span><span>苏州金鹏 · 停止开票</span><span class="sub-tab-time">11:45</span></div>
+        <div class="sub-tab-item" data-view="history-4"><span class="sub-tab-icon">💬</span><span>5 家主数据批量补全</span><span class="sub-tab-time">10:21</span></div>
+        <div class="sub-tab-item" data-view="history-5"><span class="sub-tab-icon">💬</span><span>月初认证率盘点</span><span class="sub-tab-time">昨天</span></div>
+      </div>
+      <div class="sub-tab-panel" data-subpanel="schedule" data-mode-content="work" style="display:none;">
+        <div class="sub-tab-item" data-view="schedule-1"><span class="sub-tab-icon">⏰</span><span>每日风险扫描</span><span class="sub-tab-time">每天 09:00</span></div>
+        <div class="sub-tab-item" data-view="schedule-2"><span class="sub-tab-icon">⏰</span><span>周末应收提醒</span><span class="sub-tab-time">每周五 17:00</span></div>
+        <div class="sub-tab-item" data-view="schedule-3"><span class="sub-tab-icon">⏰</span><span>月度合规报告</span><span class="sub-tab-time">每月 1 号</span></div>
+        <div class="sub-tab-item" data-view="schedule-4"><span class="sub-tab-icon">⏰</span><span>季度税务预警</span><span class="sub-tab-time">每季度</span></div>
+      </div>
+    </div>
+
+    <div class="sidebar-section" data-mode-section="agent" style="display: none; padding-top: 12px;">智能体</div>
+    <div class="agent-list" data-mode-content="agent" style="display: none;">
+      <div class="agent-item" data-agent="agent-cockpit" data-view="agent-cockpit" style="margin-bottom: 8px;">
+        <div class="agent-item-icon">🪖</div>
+        <div class="agent-item-info">
+          <div class="agent-item-name" style="font-weight: 600;">智能体驾驶舱</div>
+          <div class="agent-item-sub">4 单待确认</div>
+        </div>
+      </div>
+      <div style="height: 1px; background: var(--line); margin: 14px 0 4px 0;"></div>
+      <div class="sidebar-section-title" style="margin-top: 0; margin-bottom: 8px;">业务智能体</div>
+      <div class="agent-item active" data-agent="agent-billing" data-view="agent-billing">
+        <div class="agent-item-icon">⚡</div>
+        <div class="agent-item-info">
+          <div class="agent-item-name">智能开票专员</div>
+          <div class="agent-item-sub">今日 287 张</div>
+        </div>
+      </div>
+      <div class="agent-item" data-agent="agent-risk" data-view="agent-risk">
+        <div class="agent-item-icon">🛡</div>
+        <div class="agent-item-info">
+          <div class="agent-item-name">风险预警官</div>
+          <div class="agent-item-sub">5 家预警</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="sidebar-tool-list" data-mode-content="agent" style="display: none; padding-top: 10px; border-top: 1px solid var(--line);">
+      <div class="tool-item" data-view="tool-mgr" style="color: var(--ink-3); font-size: 12px;"><span class="tool-item-icon" style="opacity: 0.6;">⚙</span>智能体管理</div>
+    </div>
+
+    <div class="sidebar-user">
+      <div class="sidebar-user-avatar">杨</div>
+      <div class="sidebar-user-info">
+        <div class="sidebar-user-name">杨姐</div>
+        <div class="sidebar-user-role">财务经理</div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ===== 右侧主区域 ===== -->
+  <main class="demo-main">
+    <div class="main-toolbar">
+      <div class="main-toolbar-left">
+        <div class="main-toolbar-title" id="main-title">金光 AI 财智能体驾驶舱</div>
+      </div>
+      <div class="main-toolbar-meta">
+        <span>📅 2026-09-12 周四</span>
+        <span>·</span>
+        <span>实时数据</span>
+      </div>
+    </div>
+
+    <div class="main-content">
+      <div class="views-container">
+      <!-- ===== Panel 1: 智能开票专员 ===== -->
+      <div class="agent-panel active" data-view-panel="agent-billing">
+
+        <!-- 智能体状态卡 -->
+        <div class="agent-card">
+          <div class="agent-avatar">
+            AI
+            <div class="agent-avatar-sub">开票</div>
+          </div>
+          <div class="agent-info">
+            <div class="agent-status-row">
+              <span class="agent-pulse"></span>
+              <span>正在工作中 · 上次扫描 3 分钟前</span>
+            </div>
+            <div class="agent-name">智能开票专员 · 王二</div>
+            <div class="agent-desc">同时管理 287 张发票、5 家高风险客户、4 项经营预警，所有操作全程留痕。</div>
+          </div>
+          <div class="agent-progress">
+            <div class="agent-progress-label">
+              <span>今日开票进度</span>
+              <span><b>287 / 320</b></span>
+            </div>
+            <div class="agent-progress-bar">
+              <div class="agent-progress-bar-fill" style="width: 89.7%;"></div>
+            </div>
+            <div class="agent-subtasks">
+              <div class="agent-subtask"><span class="agent-subtask-dot done"></span>已自动开票 287 张（耗时 4.2 小时）</div>
+              <div class="agent-subtask"><span class="agent-subtask-dot doing"></span>3 家高危客户待财务确认</div>
+              <div class="agent-subtask"><span class="agent-subtask-dot todo"></span>2 家风险客户待处置</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- KPI -->
+        <div class="kpi-bar">
+          <div class="kpi-card">
+            <div class="label">📦 今日开票</div>
+            <div class="value">287 张</div>
+            <div class="foot">AI 处理 <span class="good">93%</span></div>
+          </div>
+          <div class="kpi-card">
+            <div class="label">⏱ 距月底申报</div>
+            <div class="value">12 天</div>
+            <div class="foot">逾期损失预估 <span class="danger">¥ 38.6万</span></div>
+          </div>
+          <div class="kpi-card">
+            <div class="label">✅ 本月认证率</div>
+            <div class="value">58.3%</div>
+            <div class="foot"><span class="good">↑ 5.2%</span> vs 上月</div>
+          </div>
+          <div class="kpi-card">
+            <div class="label">⚠ 应收预警</div>
+            <div class="value">¥ 87万</div>
+            <div class="foot">5 家客户需关注</div>
+          </div>
+        </div>
+
+        <!-- 事件流（按评分） -->
+        <div class="events">
+          <div class="events-header">
+            <div>
+              <div class="events-title">今日处理事项 · 按紧迫度排序</div>
+              <div class="events-desc">点任一事件查看 AI 完整判断依据</div>
+            </div>
+            <div class="events-summary">
+              <span>🔴 紧急 3</span>
+              <span>🟠 关注 4</span>
+              <span>🟢 常规 1</span>
+            </div>
+          </div>
+
+          <div class="event-card" data-event="event-1">
+            <div class="event-rank red"><div class="event-rank-num">92</div><div class="event-rank-label">紧急</div></div>
+            <div class="event-content">
+              <div class="event-title">
+                苏州金鹏贸易有限公司 · 税务非正常户
+                <span class="event-tag risk">风险预警</span>
+              </div>
+              <div class="event-meta">
+                <span><b>应收 ¥ 96万</b></span><span>· 5 天前被认定税务非正常</span><span>· 已触发 2 项预警</span>
+              </div>
+              <div class="event-loss">若继续开票 → 进项转出风险 <span class="danger">¥ 96万</span></div>
+            </div>
+            <div class="event-actions">
+              <button class="btn-primary" onclick="event.stopPropagation(); openModal('event-1')">⚡ 查看依据</button>
+              <button class="btn-ghost">立即停止</button>
+            </div>
+          </div>
+
+          <div class="event-card" data-event="event-2">
+            <div class="event-rank red"><div class="event-rank-num">88</div><div class="event-rank-label">紧急</div></div>
+            <div class="event-content">
+              <div class="event-title">
+                浙江光华印务有限公司 · 法人变更
+                <span class="event-tag risk">风险预警</span>
+                <span class="event-tag billing">开票异常</span>
+              </div>
+              <div class="event-meta">
+                <span><b>应收 ¥ 178万</b></span><span>· 3 天前法人变更</span><span>· 13 张发票待开</span>
+              </div>
+              <div class="event-loss">法人变更后坏账风险高，若错过本月申报，预估多缴增值税 <span class="danger">¥ 14.9万</span></div>
+            </div>
+            <div class="event-actions">
+              <button class="btn-primary" onclick="event.stopPropagation(); openModal('event-2')">⚡ 一键补全并开票</button>
+              <button class="btn-ghost">暂停发货</button>
+            </div>
+          </div>
+
+          <div class="event-card" data-event="event-3">
+            <div class="event-rank red"><div class="event-rank-num">85</div><div class="event-rank-label">紧急</div></div>
+            <div class="event-content">
+              <div class="event-title">
+                上海永胜包装材料有限公司 · 主数据严重缺项
+                <span class="event-tag billing">开票异常</span>
+              </div>
+              <div class="event-meta">
+                <span><b>待开 ¥ 124,500</b></span><span>· 缺 4 项主数据</span><span>· 距月底 12 天</span>
+              </div>
+              <div class="event-loss">原需财务手动录入地址/银行/电话各 5-10 分钟，<span class="up">AI 0.3 秒完成</span></div>
+            </div>
+            <div class="event-actions">
+              <button class="btn-primary" onclick="event.stopPropagation(); openModal('event-3')">⚡ AI 自动补全</button>
+              <button class="btn-ghost">手动录入</button>
+            </div>
+          </div>
+
+          <div class="event-card" data-event="event-7">
+            <div class="event-rank orange"><div class="event-rank-num">58</div><div class="event-rank-label">关注</div></div>
+            <div class="event-content">
+              <div class="event-title">
+                5 个客户的主数据需要一次性补全
+                <span class="event-tag billing">开票异常</span>
+              </div>
+              <div class="event-meta">
+                <span><b>5 家客户</b></span><span>· 13 项缺项</span><span>· 涉及 ¥ 96,800 待开</span>
+              </div>
+              <div class="event-loss">AI 已生成所有候选，<span class="up">财务一键确认 ≈ 2 分钟</span></div>
+            </div>
+            <div class="event-actions">
+              <button class="btn-primary" onclick="event.stopPropagation(); openModal('event-7')">⚡ 查看候选</button>
+              <button class="btn-ghost">批量确认</button>
+            </div>
+          </div>
+
+          <div class="event-card" data-event="event-safe">
+            <div class="event-rank green"><div class="event-rank-num">✓</div><div class="event-rank-label">常规</div></div>
+            <div class="event-content">
+              <div class="event-title">其余 229 家经销商 · 风险评分 &lt; 50</div>
+              <div class="event-meta">
+                <span>AI 持续监控</span><span>· 下次扫描 3 小时后</span><span>· 当前无异常</span>
+              </div>
+            </div>
+            <div class="event-actions"><button class="btn-ghost">查看完整名单</button></div>
+          </div>
+        </div>
+
+        <!-- AI 智能建议 -->
+        <div class="smart-suggest">
+          <div class="smart-suggest-header">
+            <span class="smart-suggest-icon">⚡</span>
+            <span class="smart-suggest-title">AI 智能建议 · 智能开票专员</span>
+          </div>
+          <div class="smart-suggest-list">
+            <div class="suggest-item">
+              <div class="suggest-num">1</div>
+              <div class="suggest-text">开启 <b>「风险客户自动暂停开票」</b>规则，<br>法人变更/税务异常的经销商自动暂停开票</div>
+              <div class="suggest-actions">
+                <button class="btn-ghost">暂不</button>
+                <button class="btn-ghost">修改建议</button>
+                <button class="btn-primary">立即开启 ⚡</button>
+              </div>
+            </div>
+            <div class="suggest-item">
+              <div class="suggest-num">2</div>
+              <div class="suggest-text">一键处理 <b>3 家高危客户</b>，<br>预计可挽回损失 <b>¥ 33.7万</b></div>
+              <div class="suggest-actions">
+                <button class="btn-ghost">暂不</button>
+                <button class="btn-primary">一键处理 ⚡</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ===== Panel 2: 风险预警官 ===== -->
+      <div class="agent-panel" data-view-panel="agent-risk">
+
+        <div class="agent-card">
+          <div class="agent-avatar">
+            AI
+            <div class="agent-avatar-sub">风险</div>
+          </div>
+          <div class="agent-info">
+            <div class="agent-status-row">
+              <span class="agent-pulse"></span>
+              <span>扫描中 · 已覆盖 234 家经销商</span>
+            </div>
+            <div class="agent-name">风险预警官 · 陈三</div>
+            <div class="agent-desc">7×24 监控下游客户司法/税务/工商异常，触发预警自动通知并启动回款保护。</div>
+          </div>
+          <div class="agent-progress">
+            <div class="agent-progress-label">
+              <span>本月风险扫描</span>
+              <span><b>234 / 234</b></span>
+            </div>
+            <div class="agent-progress-bar">
+              <div class="agent-progress-bar-fill" style="width: 100%;"></div>
+            </div>
+            <div class="agent-subtasks">
+              <div class="agent-subtask"><span class="agent-subtask-dot done"></span>已扫描 234 家经销商</div>
+              <div class="agent-subtask"><span class="agent-subtask-dot doing"></span>5 家高风险待处置</div>
+              <div class="agent-subtask"><span class="agent-subtask-dot todo"></span>本月挽回 ¥87万</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="kpi-bar">
+          <div class="kpi-card">
+            <div class="label">🏢 本月扫描</div>
+            <div class="value">234 家</div>
+            <div class="foot">经销商 234 · 上游 87</div>
+          </div>
+          <div class="kpi-card">
+            <div class="label">🔴 高风险</div>
+            <div class="value">5 家</div>
+            <div class="foot">触发预警已发通知</div>
+          </div>
+          <div class="kpi-card">
+            <div class="label">⏱ 距上次扫描</div>
+            <div class="value">3 小时</div>
+            <div class="foot">AI 7×24 持续监控</div>
+          </div>
+          <div class="kpi-card">
+            <div class="label">💰 本月挽回</div>
+            <div class="value">¥ 87万</div>
+            <div class="foot"><span class="good">↑ 3.2x 投入</span></div>
+          </div>
+        </div>
+
+        <div class="events">
+          <div class="events-header">
+            <div>
+              <div class="events-title">高风险客户 · 立即处置</div>
+              <div class="events-desc">按风险评分排序，5 家已触发预警</div>
+            </div>
+            <div class="events-summary">
+              <span>🔴 高危 2</span>
+              <span>🟠 关注 1</span>
+              <span>🟢 常规 1</span>
+            </div>
+          </div>
+
+          <div class="event-card" data-event="event-1">
+            <div class="event-rank red"><div class="event-rank-num">92</div><div class="event-rank-label">紧急</div></div>
+            <div class="event-content">
+              <div class="event-title">
+                苏州金鹏贸易有限公司 · 税务非正常户
+                <span class="event-tag risk">风险预警</span>
+              </div>
+              <div class="event-meta">
+                <span><b>应收 ¥ 96万</b></span><span>· 5 天前被认定税务非正常</span><span>· 已触发 2 项预警</span>
+              </div>
+              <div class="event-loss">若坏账，预估损失 <span class="danger">¥ 96万</span></div>
+            </div>
+            <div class="event-actions">
+              <button class="btn-primary" onclick="event.stopPropagation(); openModal('event-1')">⚡ 查看依据</button>
+              <button class="btn-ghost">立即停止</button>
+            </div>
+          </div>
+
+          <div class="event-card" data-event="event-2">
+            <div class="event-rank red"><div class="event-rank-num">88</div><div class="event-rank-label">紧急</div></div>
+            <div class="event-content">
+              <div class="event-title">
+                浙江光华印务有限公司 · 法人变更
+                <span class="event-tag risk">风险预警</span>
+              </div>
+              <div class="event-meta">
+                <span><b>应收 ¥ 178万</b></span><span>· 3 天前法人变更</span><span>· 已触发 2 项预警</span>
+              </div>
+              <div class="event-loss">法人变更后坏账风险高，若错过本月申报，预估多缴增值税 <span class="danger">¥ 14.9万</span></div>
+            </div>
+            <div class="event-actions">
+              <button class="btn-primary" onclick="event.stopPropagation(); openModal('event-2')">⚡ 查看依据</button>
+              <button class="btn-ghost">暂停发货</button>
+            </div>
+          </div>
+
+          <div class="event-card" data-event="event-5">
+            <div class="event-rank orange"><div class="event-rank-num">68</div><div class="event-rank-label">关注</div></div>
+            <div class="event-content">
+              <div class="event-title">
+                上海林达纸业有限公司 · 经营异常
+                <span class="event-tag risk">风险预警</span>
+              </div>
+              <div class="event-meta">
+                <span>应收 <b>¥ 42万</b></span><span>· 1 周前被列入经营异常</span><span>· 暂未触发坏账预警</span>
+              </div>
+              <div class="event-loss">建议密切关注 30 天，<span class="up">可挽回 92% 应收</span></div>
+            </div>
+            <div class="event-actions">
+              <button class="btn-primary" onclick="event.stopPropagation(); openModal('event-5')">⚡ 持续监控</button>
+              <button class="btn-ghost">生成报告</button>
+            </div>
+          </div>
+
+          <div class="event-card" data-event="event-safe">
+            <div class="event-rank green"><div class="event-rank-num">✓</div><div class="event-rank-label">常规</div></div>
+            <div class="event-content">
+              <div class="event-title">其余 229 家经销商 · 风险评分 &lt; 50</div>
+              <div class="event-meta">
+                <span>AI 持续监控</span><span>· 下次扫描 3 小时后</span><span>· 当前无异常</span>
+              </div>
+            </div>
+            <div class="event-actions"><button class="btn-ghost">查看完整名单</button></div>
+          </div>
+        </div>
+
+        <div class="smart-suggest">
+          <div class="smart-suggest-header">
+            <span class="smart-suggest-icon">⚡</span>
+            <span class="smart-suggest-title">AI 智能建议 · 风险预警官</span>
+          </div>
+          <div class="smart-suggest-list">
+            <div class="suggest-item">
+              <div class="suggest-num">1</div>
+              <div class="suggest-text">立即停止与 <b>2 家高危客户</b> 合作，<br>浙江光华 + 苏州金鹏，建议暂停发货并启动回款保护</div>
+              <div class="suggest-actions">
+                <button class="btn-ghost">暂不</button>
+                <button class="btn-primary">一键暂停发货 ⚡</button>
+              </div>
+            </div>
+            <div class="suggest-item">
+              <div class="suggest-num">2</div>
+              <div class="suggest-text">为 <b>3 家高风险客户</b> 自动调整账期（90天→30天），<br>预估可挽回 <b>¥ 87万</b></div>
+              <div class="suggest-actions">
+                <button class="btn-ghost">暂不</button>
+                <button class="btn-primary">调整账期</button>
+              </div>
+            </div>
+            <div class="suggest-item">
+              <div class="suggest-num">3</div>
+              <div class="suggest-text">开启 <b>「动态风险扫描」</b>，从月度改为每日，<br>捕捉异常变 <b>更早 7 天</b></div>
+              <div class="suggest-actions">
+                <button class="btn-ghost">暂不</button>
+                <button class="btn-ghost">修改建议</button>
+                <button class="btn-primary">立即开启</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ===== Panel 3: 经营驾驶舱 ===== -->
+      <div class="agent-panel" data-view-panel="agent-kpi">
+
+        <div class="agent-card">
+          <div class="agent-avatar">
+            AI
+            <div class="agent-avatar-sub">经营</div>
+          </div>
+          <div class="agent-info">
+            <div class="agent-status-row">
+              <span class="agent-pulse"></span>
+              <span>实时监控中 · 经营信号</span>
+            </div>
+            <div class="agent-name">经营驾驶舱 · 林一</div>
+            <div class="agent-desc">全链路经营信号分析：采购→生产→销售→回款，异常时主动提醒管理层。</div>
+          </div>
+          <div class="agent-progress">
+            <div class="agent-progress-label">
+              <span>本月经营健康</span>
+              <span><b>82.9%</b></span>
+            </div>
+            <div class="agent-progress-bar">
+              <div class="agent-progress-bar-fill" style="width: 82.9%;"></div>
+            </div>
+            <div class="agent-subtasks">
+              <div class="agent-subtask"><span class="agent-subtask-dot done"></span>采购 / 生产 / 销售 正常</div>
+              <div class="agent-subtask"><span class="agent-subtask-dot doing"></span>回款率 -2.3pp 待分析</div>
+              <div class="agent-subtask"><span class="agent-subtask-dot todo"></span>净利下降 4%</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="kpi-bar">
+          <div class="kpi-card">
+            <div class="label">📊 本月净利</div>
+            <div class="value">¥ 234万</div>
+            <div class="foot"><span class="danger">↓ 4%</span> 销售增回款降</div>
+          </div>
+          <div class="kpi-card">
+            <div class="label">💰 回款率</div>
+            <div class="value">82.9%</div>
+            <div class="foot"><span class="danger">↓ 2.3pp</span> vs 上月</div>
+          </div>
+          <div class="kpi-card">
+            <div class="label">⚠ 应收预警</div>
+            <div class="value">¥ 87万</div>
+            <div class="foot">5 家客户需关注</div>
+          </div>
+          <div class="kpi-card">
+            <div class="label">📈 本月销售</div>
+            <div class="value">¥ 2.34亿</div>
+            <div class="foot"><span class="good">↑ 18%</span> vs 上月</div>
+          </div>
+        </div>
+
+        <div class="events">
+          <div class="events-header">
+            <div>
+              <div class="events-title">经营预警 · 增长不收钱信号</div>
+              <div class="events-desc">销售 +18% 但回款率 -2.3pp，建议立即调整账期</div>
+            </div>
+            <div class="events-summary">
+              <span>🟠 关注 1</span>
+              <span>🟢 常规 1</span>
+            </div>
+          </div>
+
+          <div class="event-card" data-event="event-4">
+            <div class="event-rank orange"><div class="event-rank-num">71</div><div class="event-rank-label">关注</div></div>
+            <div class="event-content">
+              <div class="event-title">
+                本月回款率下降 2.3pp · "增长不收钱"信号
+                <span class="event-tag kpi">经营预警</span>
+              </div>
+              <div class="event-meta">
+                <span><b>销售 +18%</b></span><span>· <b>回款率 82.9%（↓2.3pp）</b></span><span>· 应收周转恶化</span>
+              </div>
+              <div class="event-loss">若不调整，<b>预计下月净利再降 5%</b></div>
+            </div>
+            <div class="event-actions">
+              <button class="btn-primary" onclick="event.stopPropagation(); openModal('event-4')">⚡ 查看诊断</button>
+              <button class="btn-ghost">调整账期</button>
+            </div>
+          </div>
+
+          <div class="event-card" data-event="event-safe">
+            <div class="event-rank green"><div class="event-rank-num">✓</div><div class="event-rank-label">常规</div></div>
+            <div class="event-content">
+              <div class="event-title">采购 / 生产 / 销售环节无异常</div>
+              <div class="event-meta">
+                <span>采购 ¥1.86亿</span><span>· 生产 12.3 万令</span><span>· 销售 ¥2.34亿</span>
+              </div>
+            </div>
+            <div class="event-actions"><button class="btn-ghost">查看全链路</button></div>
+          </div>
+        </div>
+
+        <div class="smart-suggest">
+          <div class="smart-suggest-header">
+            <span class="smart-suggest-icon">⚡</span>
+            <span class="smart-suggest-title">AI 智能建议 · 经营驾驶舱</span>
+          </div>
+          <div class="smart-suggest-list">
+            <div class="suggest-item">
+              <div class="suggest-num">1</div>
+              <div class="suggest-text">暂停与 <b>2 家高风险经销商</b> 合作，<br>预计下月回款率回升 6pp</div>
+              <div class="suggest-actions">
+                <button class="btn-ghost">暂不</button>
+                <button class="btn-primary">查看详情 →</button>
+              </div>
+            </div>
+            <div class="suggest-item">
+              <div class="suggest-num">2</div>
+              <div class="suggest-text">启用 <b>「销售-回款联动预警」</b>，<br>销售增长时自动检查应收健康</div>
+              <div class="suggest-actions">
+                <button class="btn-ghost">暂不</button>
+                <button class="btn-ghost">修改建议</button>
+                <button class="btn-primary">立即开启</button>
+              </div>
+            </div>
+            <div class="suggest-item">
+              <div class="suggest-num">3</div>
+              <div class="suggest-text">AI 已生成 <b>「经营诊断报告」</b>，<br>含 5 项行动建议 + 1 页 PPT 摘要</div>
+              <div class="suggest-actions">
+                <button class="btn-ghost">暂不</button>
+                <button class="btn-ghost">修改建议</button>
+                <button class="btn-primary">查看报告</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ===== 默认视图：工作台模式（数据看板 / 智能开票专员） ===== -->
+            <!-- ===== 视图：智能体驾驶舱（参考税务合伙人 v2） ===== -->
+      <div class="view-panel" data-view-panel="agent-cockpit">
+        <div style="padding: 24px; background: var(--canvas); height: calc(100vh - 60px); overflow-y: auto;">
+
+          <!-- 区 1：智能体团队状态（顶部 1 长卡） -->
+          <div class="dash-kpi-strip" style="padding: 18px 24px 20px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+              <div>
+                <div style="font-size: 14px; font-weight: 600; color: var(--ink-1);">🪖 智能体团队状态</div>
+                <div style="font-size: 11px; color: var(--ink-3); margin-top: 2px;">3 个在线 · 0 离线 · 实时同步</div>
+              </div>
+              <button class="btn-ghost">⚙ 配置中心</button>
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0; padding-top: 12px; border-top: 1px solid var(--line);">
+              <div style="padding: 10px 14px; display: flex; align-items: center; gap: 12px;">
+                <span style="width: 8px; height: 8px; border-radius: 4px; background: var(--success); box-shadow: 0 0 8px var(--success);"></span>
+                <div style="flex: 1;">
+                  <div style="font-size: 13px; font-weight: 500; color: var(--ink-1);">⚠️ 风险预警官</div>
+                  <div style="font-size: 11px; color: var(--ink-3); margin-top: 2px;">集团风险扫描 · 进度 67%</div>
+                </div>
+                <span style="font-size: 11px; color: var(--success); background: rgba(46, 158, 91, 0.1); padding: 2px 8px; border-radius: 8px;">在线运行</span>
+              </div>
+              <div style="padding: 10px 14px; border-left: 1px solid var(--line); display: flex; align-items: center; gap: 12px;">
+                <span style="width: 8px; height: 8px; border-radius: 4px; background: var(--success); box-shadow: 0 0 8px var(--success);"></span>
+                <div style="flex: 1;">
+                  <div style="font-size: 13px; font-weight: 500; color: var(--ink-1);">⚡ 智能开票专员</div>
+                  <div style="font-size: 11px; color: var(--ink-3); margin-top: 2px;">自动开票 287 张 · 4.2 小时</div>
+                </div>
+                <span style="font-size: 11px; color: var(--success); background: rgba(46, 158, 91, 0.1); padding: 2px 8px; border-radius: 8px;">在线运行</span>
+              </div>
+              <div style="padding: 10px 14px; border-left: 1px solid var(--line); display: flex; align-items: center; gap: 12px;">
+                <span style="width: 8px; height: 8px; border-radius: 4px; background: var(--brass);"></span>
+                <div style="flex: 1;">
+                  <div style="font-size: 13px; font-weight: 500; color: var(--ink-1);">🔧 客户补全专员</div>
+                  <div style="font-size: 11px; color: var(--ink-3); margin-top: 2px;">待补全 5 家 · 18 项</div>
+                </div>
+                <span style="font-size: 11px; color: var(--brass); background: rgba(140, 106, 58, 0.12); padding: 2px 8px; border-radius: 8px;">待你确认</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 区 2：智能体工作卡片（3 张大卡并排） -->
+          <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 16px;">
+            <div class="dash-card" style="margin-bottom: 0; border-left: 3px solid var(--danger);">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                  <span style="font-size: 18px;">⚠️</span>
+                  <div style="font-size: 13px; font-weight: 600; color: var(--ink-1);">风险预警官</div>
+                </div>
+                <span style="font-size: 10px; color: var(--paper); background: var(--danger); padding: 2px 8px; border-radius: 8px; font-weight: 600;">高优先级</span>
+              </div>
+              <div style="font-size: 11px; color: var(--ink-3); margin-bottom: 4px;">今日动作</div>
+              <div style="font-size: 12px; color: var(--ink-1); margin-bottom: 8px;">集团风险扫描 <span style="color: var(--ink-3);">234 / 350 家</span></div>
+              <div style="font-size: 11px; color: var(--ink-3); margin-bottom: 4px;">发现</div>
+              <div style="font-size: 12px; color: var(--ink-1); margin-bottom: 8px;">5 家异常，3 家高风险敞口 <b style="color: var(--danger);">¥87万</b></div>
+              <div style="font-size: 11px; color: var(--ink-3); margin-bottom: 4px;">下一步</div>
+              <div style="font-size: 12px; color: var(--ink-2); margin-bottom: 12px;">建议生成集团风控报告，等待你的确认</div>
+              <button class="btn-primary" style="width: 100%; height: 32px;" onclick="switchView('agent-risk')">进入智能体 →</button>
+            </div>
+
+            <div class="dash-card" style="margin-bottom: 0; border-left: 3px solid var(--success);">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                  <span style="font-size: 18px;">⚡</span>
+                  <div style="font-size: 13px; font-weight: 600; color: var(--ink-1);">智能开票专员</div>
+                </div>
+                <span style="font-size: 10px; color: var(--success); background: rgba(46, 158, 91, 0.1); padding: 2px 8px; border-radius: 8px; font-weight: 600;">正常执行</span>
+              </div>
+              <div style="font-size: 11px; color: var(--ink-3); margin-bottom: 4px;">今日动作</div>
+              <div style="font-size: 12px; color: var(--ink-1); margin-bottom: 8px;">自动开票 287 张 <span style="color: var(--ink-3);">¥324,500</span></div>
+              <div style="font-size: 11px; color: var(--ink-3); margin-bottom: 4px;">发现</div>
+              <div style="font-size: 12px; color: var(--ink-1); margin-bottom: 8px;">3 张需人工确认（苏州金鹏 ¥18,500 / ¥96,000）</div>
+              <div style="font-size: 11px; color: var(--ink-3); margin-bottom: 4px;">下一步</div>
+              <div style="font-size: 12px; color: var(--ink-2); margin-bottom: 12px;">等待财务确认后继续执行</div>
+              <button class="btn-primary" style="width: 100%; height: 32px;" onclick="switchView('agent-billing')">进入智能体 →</button>
+            </div>
+
+            <div class="dash-card" style="margin-bottom: 0; border-left: 3px solid var(--brass);">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                  <span style="font-size: 18px;">🔧</span>
+                  <div style="font-size: 13px; font-weight: 600; color: var(--ink-1);">客户补全专员</div>
+                </div>
+                <span style="font-size: 10px; color: var(--brass); background: rgba(140, 106, 58, 0.12); padding: 2px 8px; border-radius: 8px; font-weight: 600;">待你确认</span>
+              </div>
+              <div style="font-size: 11px; color: var(--ink-3); margin-bottom: 4px;">今日动作</div>
+              <div style="font-size: 12px; color: var(--ink-1); margin-bottom: 8px;">批量补全 5 家客户 18 项主数据</div>
+              <div style="font-size: 11px; color: var(--ink-3); margin-bottom: 4px;">发现</div>
+              <div style="font-size: 12px; color: var(--ink-1); margin-bottom: 8px;">待你确认 4 单（永胜/金鹏/新天/华诚）</div>
+              <div style="font-size: 11px; color: var(--ink-3); margin-bottom: 4px;">下一步</div>
+              <div style="font-size: 12px; color: var(--ink-2); margin-bottom: 12px;">补全后将自动触发开票流程</div>
+              <button class="btn-primary" style="width: 100%; height: 32px;" onclick="switchView('agent-billing')">进入智能体 →</button>
+            </div>
+          </div>
+
+          <!-- 区 3：待我确认（4 单纵向） -->
+          <div class="dash-card" style="padding: 18px 22px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+              <div>
+                <div style="font-size: 14px; font-weight: 600; color: var(--ink-1);">⏰ 待我确认 · 4 单</div>
+                <div style="font-size: 11px; color: var(--ink-3); margin-top: 2px;">AI 等待你拍板的工作 · 点击同意/拒绝</div>
+              </div>
+              <button class="btn-ghost">[✓ 全部同意]</button>
+            </div>
+
+            <div style="display: flex; flex-direction: column; gap: 10px;">
+              <div style="display: flex; gap: 12px; padding: 12px 14px; background: rgba(185, 52, 44, 0.05); border: 1px solid rgba(185, 52, 44, 0.15); border-radius: var(--r); border-left: 3px solid var(--danger);">
+                <div style="flex-shrink: 0; width: 60px;">
+                  <div style="font-size: 11px; color: var(--ink-3);">来源</div>
+                  <div style="font-size: 12px; color: var(--ink-1); font-weight: 500;">⚠️ 风险预警官</div>
+                </div>
+                <div style="flex: 1;">
+                  <div style="font-size: 13px; font-weight: 600; color: var(--ink-1); margin-bottom: 4px;">苏州金鹏 · 税务非正常户</div>
+                  <div style="font-size: 12px; color: var(--ink-2); margin-bottom: 4px;"><b>影响：</b>若继续开票，进项转出风险 <b style="color: var(--danger);">¥96万</b></div>
+                  <div style="font-size: 12px; color: var(--ink-2);"><b>AI 建议：</b>立即停止开票，启动法务催收</div>
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 6px; flex-shrink: 0;">
+                  <button class="btn-primary" style="height: 28px; padding: 0 14px; font-size: 11px;">✓ 同意</button>
+                  <button class="btn-cancel" style="height: 28px; padding: 0 14px; font-size: 11px;">✗ 拒绝</button>
+                </div>
+              </div>
+
+              <div style="display: flex; gap: 12px; padding: 12px 14px; background: rgba(140, 106, 58, 0.05); border: 1px solid rgba(140, 106, 58, 0.15); border-radius: var(--r); border-left: 3px solid var(--brass);">
+                <div style="flex-shrink: 0; width: 60px;">
+                  <div style="font-size: 11px; color: var(--ink-3);">来源</div>
+                  <div style="font-size: 12px; color: var(--ink-1); font-weight: 500;">⚠️ 风险预警官</div>
+                </div>
+                <div style="flex: 1;">
+                  <div style="font-size: 13px; font-weight: 600; color: var(--ink-1); margin-bottom: 4px;">浙江光华 · 法人变更</div>
+                  <div style="font-size: 12px; color: var(--ink-2); margin-bottom: 4px;"><b>影响：</b>欠款 <b style="color: var(--brass);">¥178万</b>，账期 90 → 30 天</div>
+                  <div style="font-size: 12px; color: var(--ink-2);"><b>AI 建议：</b>暂缓新增发货，等新法人资金到位</div>
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 6px; flex-shrink: 0;">
+                  <button class="btn-primary" style="height: 28px; padding: 0 14px; font-size: 11px;">✓ 同意</button>
+                  <button class="btn-cancel" style="height: 28px; padding: 0 14px; font-size: 11px;">✗ 拒绝</button>
+                </div>
+              </div>
+
+              <div style="display: flex; gap: 12px; padding: 12px 14px; background: rgba(185, 52, 44, 0.05); border: 1px solid rgba(185, 52, 44, 0.15); border-radius: var(--r); border-left: 3px solid var(--danger);">
+                <div style="flex-shrink: 0; width: 60px;">
+                  <div style="font-size: 11px; color: var(--ink-3);">来源</div>
+                  <div style="font-size: 12px; color: var(--ink-1); font-weight: 500;">⚡ 开票专员</div>
+                </div>
+                <div style="flex: 1;">
+                  <div style="font-size: 13px; font-weight: 600; color: var(--ink-1); margin-bottom: 4px;">苏州金鹏 ¥18,500</div>
+                  <div style="font-size: 12px; color: var(--ink-2); margin-bottom: 4px;"><b>影响：</b>客户已停止合作，继续开票将面临税务异常</div>
+                  <div style="font-size: 12px; color: var(--ink-2);"><b>AI 建议：</b>停止开票，归档待查</div>
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 6px; flex-shrink: 0;">
+                  <button class="btn-primary" style="height: 28px; padding: 0 14px; font-size: 11px;">✓ 同意</button>
+                  <button class="btn-cancel" style="height: 28px; padding: 0 14px; font-size: 11px;">✗ 拒绝</button>
+                </div>
+              </div>
+
+              <div style="display: flex; gap: 12px; padding: 12px 14px; background: rgba(46, 158, 91, 0.05); border: 1px solid rgba(46, 158, 91, 0.15); border-radius: var(--r); border-left: 3px solid var(--success);">
+                <div style="flex-shrink: 0; width: 60px;">
+                  <div style="font-size: 11px; color: var(--ink-3);">来源</div>
+                  <div style="font-size: 12px; color: var(--ink-1); font-weight: 500;">🔧 补全专员</div>
+                </div>
+                <div style="flex: 1;">
+                  <div style="font-size: 13px; font-weight: 600; color: var(--ink-1); margin-bottom: 4px;">上海永胜 4 项主数据</div>
+                  <div style="font-size: 12px; color: var(--ink-2); margin-bottom: 4px;"><b>影响：</b>主数据缺失 4 项，无法开票 <b style="color: var(--success);">¥124,500</b></div>
+                  <div style="font-size: 12px; color: var(--ink-2);"><b>AI 建议：</b>从工商接口拉取，立即补全</div>
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 6px; flex-shrink: 0;">
+                  <button class="btn-primary" style="height: 28px; padding: 0 14px; font-size: 11px;">✓ 同意</button>
+                  <button class="btn-cancel" style="height: 28px; padding: 0 14px; font-size: 11px;">✗ 拒绝</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 区 4：正在执行 -->
+          <div class="dash-card" style="padding: 18px 22px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+              <div>
+                <div style="font-size: 14px; font-weight: 600; color: var(--ink-1);">⚙️ 正在执行 · 3 个任务</div>
+                <div style="font-size: 11px; color: var(--ink-3); margin-top: 2px;">AI 自动运行中的任务 · 可手动暂停</div>
+              </div>
+              <button class="btn-ghost">⏸ 暂停全部</button>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 14px;">
+              <div>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                  <div style="font-size: 13px; font-weight: 500; color: var(--ink-1);">🛡 每日风险扫描</div>
+                  <div style="display: flex; gap: 12px; align-items: center; font-size: 11px; color: var(--ink-3);">
+                    <span>扫描 234 / 350 家</span>
+                    <span>预计完成 16:00</span>
+                  </div>
+                </div>
+                <div style="height: 6px; background: var(--line); border-radius: 3px; overflow: hidden;">
+                  <div style="height: 100%; width: 67%; background: var(--success); border-radius: 3px;"></div>
+                </div>
+              </div>
+              <div>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                  <div style="font-size: 13px; font-weight: 500; color: var(--ink-1);">⚡ 自动开票任务</div>
+                  <div style="display: flex; gap: 12px; align-items: center; font-size: 11px; color: var(--ink-3);">
+                    <span>开票 287 / 320 张</span>
+                    <span>预计完成 18:30</span>
+                  </div>
+                </div>
+                <div style="height: 6px; background: var(--line); border-radius: 3px; overflow: hidden;">
+                  <div style="height: 100%; width: 89%; background: var(--success); border-radius: 3px;"></div>
+                </div>
+              </div>
+              <div>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                  <div style="font-size: 13px; font-weight: 500; color: var(--ink-1);">📅 月度合规报告</div>
+                  <div style="display: flex; gap: 12px; align-items: center; font-size: 11px; color: var(--ink-3);">
+                    <span>收集 89 / 380 单据</span>
+                    <span>预计完成 09-20</span>
+                  </div>
+                </div>
+                <div style="height: 6px; background: var(--line); border-radius: 3px; overflow: hidden;">
+                  <div style="height: 100%; width: 23%; background: var(--brass); border-radius: 3px;"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 区 5 + 区 6 双列布局 -->
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 24px;">
+            <div class="dash-card" style="padding: 18px 22px; margin-bottom: 0;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+                <div style="font-size: 14px; font-weight: 600; color: var(--ink-1);">🔧 能力与工具状态</div>
+                <button class="btn-ghost">配置中心 →</button>
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 10px;">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                  <span style="width: 8px; height: 8px; border-radius: 4px; background: var(--success);"></span>
+                  <span style="flex: 1; font-size: 12px;">票易通 MCP</span>
+                  <span style="font-size: 11px; color: var(--ink-3);">今日 387 次</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 10px;">
+                  <span style="width: 8px; height: 8px; border-radius: 4px; background: var(--success);"></span>
+                  <span style="flex: 1; font-size: 12px;">乐企直连</span>
+                  <span style="font-size: 11px; color: var(--ink-3);">今日 92 次</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 10px;">
+                  <span style="width: 8px; height: 8px; border-radius: 4px; background: var(--brass);"></span>
+                  <span style="flex: 1; font-size: 12px;">工商数据接口</span>
+                  <span style="font-size: 11px; color: var(--brass);">剩余 23/1000 次</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 10px;">
+                  <span style="width: 8px; height: 8px; border-radius: 4px; background: var(--success);"></span>
+                  <span style="flex: 1; font-size: 12px;">风险评分模型</span>
+                  <span style="font-size: 11px; color: var(--ink-3);">v3.2.1</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 10px;">
+                  <span style="width: 8px; height: 8px; border-radius: 4px; background: var(--success);"></span>
+                  <span style="flex: 1; font-size: 12px;">金蝶 ERP</span>
+                  <span style="font-size: 11px; color: var(--ink-3);">实时同步中</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="dash-card" style="padding: 18px 22px; margin-bottom: 0;">
+              <div style="font-size: 14px; font-weight: 600; color: var(--ink-1); margin-bottom: 14px;">🚀 快捷调度</div>
+              <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px;">
+                <button class="btn-primary" style="height: 36px; padding: 0 10px; font-size: 11px;">⚡ 一键风险扫描</button>
+                <button class="btn-primary" style="height: 36px; padding: 0 10px; font-size: 11px;">🌅 智能体晨报</button>
+                <button class="btn-primary" style="height: 36px; padding: 0 10px; font-size: 11px;">📋 集团风控报告</button>
+                <button class="btn-primary" style="height: 36px; padding: 0 10px; font-size: 11px;">🔍 全量客户盘点</button>
+                <button class="btn-primary" style="height: 36px; padding: 0 10px; font-size: 11px;">📊 月度合规报告</button>
+                <button class="btn-primary" style="height: 36px; padding: 0 10px; font-size: 11px;">📤 批量补全</button>
+                <button class="btn-primary" style="height: 36px; padding: 0 10px; font-size: 11px;">🤖 AI 团队周报</button>
+                <button class="btn-cancel" style="height: 36px; padding: 0 10px; font-size: 11px;">⏸ 全部暂停</button>
+                <button class="btn-cancel" style="height: 36px; padding: 0 10px; font-size: 11px;">⏹ 关闭智能体</button>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ===== 视图：智能开票专员驾驶舱 ===== -->
+      <div class="view-panel" data-view-panel="agent-billing">
+
+      <div class="view-panel" data-view-panel="data-board">
+        <div style="padding: 24px; background: var(--canvas); height: calc(100vh - 60px); overflow-y: auto;">
+
+          <!-- 区 1：顶部今日总览 -->
+          <div class="dash-kpi-strip">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+              <div>
+                <div style="font-size: 14px; font-weight: 600; color: var(--ink-1);">今日 AI 工作报告</div>
+                <div style="font-size: 11px; color: var(--ink-3); margin-top: 2px;">报告期 2026-09-17 22:00 · 实时</div>
+              </div>
+              <button class="btn-ghost">↓ 导出今日简报</button>
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1px 1fr 1px 1fr 1px 1fr; gap: 0; padding-top: 12px; border-top: 1px solid var(--line);">
+              <div style="text-align: center;">
+                <div style="font-size: 28px; font-weight: 700; color: var(--ink-1);" data-counter="287" data-suffix="张">287 张</div>
+                <div style="font-size: 11px; color: var(--ink-3); margin-top: 4px;">自动开票</div>
+                <div style="font-size: 10px; color: var(--success); margin-top: 2px;">↗ vs 昨日 +12</div>
+              </div>
+              <div style="background: var(--line);"></div>
+              <div style="text-align: center;">
+                <div style="font-size: 28px; font-weight: 700; color: var(--ink-1);" data-counter="4.2" data-suffix="小时">4.2 小时</div>
+                <div style="font-size: 11px; color: var(--ink-3); margin-top: 4px;">节省人力</div>
+                <div style="font-size: 10px; color: var(--success); margin-top: 2px;">↘ vs 昨日 +0.3</div>
+              </div>
+              <div style="background: var(--line);"></div>
+              <div style="text-align: center;">
+                <div style="font-size: 28px; font-weight: 700; color: var(--ink-1);" data-counter="5" data-suffix="家">5 家</div>
+                <div style="font-size: 11px; color: var(--ink-3); margin-top: 4px;">触发预警</div>
+                <div style="font-size: 10px; color: var(--danger); margin-top: 2px;">↗ vs 昨日 +1</div>
+              </div>
+              <div style="background: var(--line);"></div>
+              <div style="text-align: center;">
+                <div style="font-size: 28px; font-weight: 700; color: var(--ink-1);" data-counter="4" data-suffix="单">4 单</div>
+                <div style="font-size: 11px; color: var(--ink-3); margin-top: 4px;">待拍板</div>
+                <div style="font-size: 10px; color: var(--brass); margin-top: 2px;">等你决定</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 区 2：客户信息补全 -->
+          <div class="dash-card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+              <div style="display: flex; align-items: center; gap: 10px;">
+                <div style="width: 32px; height: 32px; border-radius: 8px; background: var(--ink-1); color: var(--brass); display: flex; align-items: center; justify-content: center; font-size: 14px;">🔧</div>
+                <div>
+                  <div style="font-size: 14px; font-weight: 600; color: var(--ink-1);">客户信息补全</div>
+                  <div style="font-size: 11px; color: var(--ink-3);">智能开票专员 · 主数据自动补全</div>
+                </div>
+              </div>
+              <button class="btn-ghost" onclick="switchView('agent-billing')">打开智能体 →</button>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 12px; margin-bottom: 16px;">
+              <div style="text-align: center; padding: 12px; background: var(--canvas); border-radius: var(--r);">
+                <div style="font-size: 22px; font-weight: 700; color: var(--ink-1);">5 家</div>
+                <div style="font-size: 11px; color: var(--ink-3); margin-top: 2px;">今日处理</div>
+                <div style="font-size: 10px; color: var(--ink-2); margin-top: 2px;">18 项缺漏</div>
+              </div>
+              <div style="text-align: center; padding: 12px; background: var(--canvas); border-radius: var(--r);">
+                <div style="font-size: 22px; font-weight: 700; color: var(--ink-1);">86.2%</div>
+                <div style="font-size: 11px; color: var(--ink-3); margin-top: 2px;">累计率</div>
+                <div style="font-size: 10px; color: var(--success); margin-top: 2px;">▲ +2.3pp</div>
+              </div>
+              <div style="text-align: center; padding: 12px; background: var(--canvas); border-radius: var(--r);">
+                <div style="font-size: 22px; font-weight: 700; color: var(--ink-1);">27 家</div>
+                <div style="font-size: 11px; color: var(--ink-3); margin-top: 2px;">待补全</div>
+                <div style="font-size: 10px; color: var(--ink-2); margin-top: 2px;">¥96,800</div>
+              </div>
+              <div style="padding: 12px; background: var(--canvas); border-radius: var(--r); font-size: 11px;">
+                <div style="font-size: 11px; color: var(--ink-3); margin-bottom: 6px;">缺失项分布</div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 3px;"><span style="color: var(--ink-2);">📞 电话</span><b>38%</b></div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 3px;"><span style="color: var(--ink-2);">🏦 银行</span><b>28%</b></div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 3px;"><span style="color: var(--ink-2);">📍 地址</span><b>22%</b></div>
+                <div style="display: flex; justify-content: space-between;"><span style="color: var(--ink-2);">📧 邮箱</span><b>12%</b></div>
+              </div>
+            </div>
+
+            <div style="font-size: 11px; color: var(--ink-3); margin-bottom: 8px;">最近处理</div>
+            <div style="display: flex; flex-direction: column; gap: 6px;">
+              <div style="display: flex; align-items: center; padding: 8px 12px; background: var(--canvas); border-radius: var(--r-sm); font-size: 12px;">
+                <span style="color: var(--success); margin-right: 8px;">✓</span>
+                <span style="flex: 1; color: var(--ink-2);">上海永胜包装</span>
+                <span style="color: var(--ink-3); margin-right: 12px;">4 项补全 · 14:32</span>
+                <span style="color: var(--ink-1); cursor: pointer;">[查看]</span>
+              </div>
+              <div style="display: flex; align-items: center; padding: 8px 12px; background: var(--canvas); border-radius: var(--r-sm); font-size: 12px;">
+                <span style="color: var(--success); margin-right: 8px;">✓</span>
+                <span style="flex: 1; color: var(--ink-2);">5 家批量补全</span>
+                <span style="color: var(--ink-3); margin-right: 12px;">13 项补全 · 10:21</span>
+                <span style="color: var(--ink-1); cursor: pointer;">[查看]</span>
+              </div>
+              <div style="display: flex; align-items: center; padding: 8px 12px; background: var(--canvas); border-radius: var(--r-sm); font-size: 12px;">
+                <span style="color: var(--success); margin-right: 8px;">✓</span>
+                <span style="flex: 1; color: var(--ink-2);">苏州金鹏</span>
+                <span style="color: var(--ink-3); margin-right: 12px;">2 项补全 · 11:45</span>
+                <span style="color: var(--ink-1); cursor: pointer;">[查看]</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 区 3：自动开票 + 折线图 -->
+          <div class="dash-card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+              <div style="display: flex; align-items: center; gap: 10px;">
+                <div style="width: 32px; height: 32px; border-radius: 8px; background: var(--ink-1); color: var(--brass); display: flex; align-items: center; justify-content: center; font-size: 14px;">⚡</div>
+                <div>
+                  <div style="font-size: 14px; font-weight: 600; color: var(--ink-1);">自动开票</div>
+                  <div style="font-size: 11px; color: var(--ink-3);">智能开票专员 · 自动开票与异常拦截</div>
+                </div>
+              </div>
+              <button class="btn-ghost" onclick="switchView('agent-billing')">打开智能体 →</button>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 12px; margin-bottom: 16px;">
+              <div style="text-align: center; padding: 12px; background: var(--canvas); border-radius: var(--r);">
+                <div style="font-size: 22px; font-weight: 700; color: var(--ink-1);">287 张</div>
+                <div style="font-size: 11px; color: var(--ink-3); margin-top: 2px;">今日开票</div>
+                <div style="font-size: 10px; color: var(--ink-2); margin-top: 2px;">¥324,500</div>
+              </div>
+              <div style="text-align: center; padding: 12px; background: var(--canvas); border-radius: var(--r);">
+                <div style="font-size: 22px; font-weight: 700; color: var(--ink-1);">4,128 张</div>
+                <div style="font-size: 11px; color: var(--ink-3); margin-top: 2px;">本月开票</div>
+                <div style="font-size: 10px; color: var(--ink-2); margin-top: 2px;">¥4.36亿</div>
+              </div>
+              <div style="text-align: center; padding: 12px; background: var(--canvas); border-radius: var(--r);">
+                <div style="font-size: 22px; font-weight: 700; color: var(--ink-1);">98.7%</div>
+                <div style="font-size: 11px; color: var(--ink-3); margin-top: 2px;">通过率</div>
+                <div style="font-size: 10px; color: var(--success); margin-top: 2px;">▲ +0.4pp</div>
+              </div>
+              <div style="text-align: center; padding: 12px; background: var(--canvas); border-radius: var(--r);">
+                <div style="font-size: 22px; font-weight: 700; color: var(--danger);">3 张</div>
+                <div style="font-size: 11px; color: var(--ink-3); margin-top: 2px;">异常</div>
+                <div style="font-size: 10px; color: var(--ink-2); margin-top: 2px;">需财务确认</div>
+              </div>
+            </div>
+
+            <!-- 14 天开票折线图（纯 SVG） -->
+            <div style="padding: 16px; background: var(--canvas); border-radius: var(--r);">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                <div style="font-size: 11px; color: var(--ink-3);">近期开票趋势 · 最近 14 天</div>
+                <div style="font-size: 10px; color: var(--ink-3);">日均 <b style="color: var(--ink-1);">265 张</b></div>
+              </div>
+              <svg viewBox="0 0 600 80" style="width: 100%; height: 80px; display: block;">
+                <polyline points="20,55 60,42 100,50 140,30 180,38 220,22 260,28 300,18 340,32 380,15 420,20 460,28 500,12 540,22 580,15"
+                          fill="none" stroke="#1a1f2e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <polyline points="20,55 60,42 100,50 140,30 180,38 220,22 260,28 300,18 340,32 380,15 420,20 460,28 500,12 540,22 580,15 580,80 20,80"
+                          fill="#1a1f2e" fill-opacity="0.06" stroke="none"/>
+                <circle cx="580" cy="15" r="3.5" fill="#8c6a3a" stroke="var(--paper)" stroke-width="2"/>
+              </svg>
+              <div style="display: flex; justify-content: space-between; margin-top: 4px; font-size: 10px; color: var(--ink-3);">
+                <span>9/04</span><span>9/08</span><span>9/11</span><span>9/14</span><span>9/17</span>
+              </div>
+            </div>
+
+            <div style="font-size: 11px; color: var(--ink-3); margin: 16px 0 8px;">今日待确认</div>
+            <div style="display: flex; flex-direction: column; gap: 6px;">
+              <div style="display: flex; align-items: center; padding: 8px 12px; background: rgba(185, 52, 44, 0.06); border: 1px solid rgba(185, 52, 44, 0.2); border-radius: var(--r-sm); font-size: 12px;">
+                <span style="color: var(--danger); margin-right: 8px;">⏸</span>
+                <span style="flex: 1; color: var(--ink-2);">苏州金鹏 ¥18,500</span>
+                <span style="color: var(--danger); margin-right: 12px;">触发风险规则</span>
+                <span style="color: var(--ink-1); cursor: pointer;">[查看]</span>
+              </div>
+              <div style="display: flex; align-items: center; padding: 8px 12px; background: rgba(185, 52, 44, 0.06); border: 1px solid rgba(185, 52, 44, 0.2); border-radius: var(--r-sm); font-size: 12px;">
+                <span style="color: var(--danger); margin-right: 8px;">⏸</span>
+                <span style="flex: 1; color: var(--ink-2);">苏州金鹏 ¥96,000</span>
+                <span style="color: var(--danger); margin-right: 12px;">客户已停止合作</span>
+                <span style="color: var(--ink-1); cursor: pointer;">[查看]</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 区 4：公司风险监控 -->
+          <div class="dash-card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+              <div style="display: flex; align-items: center; gap: 10px;">
+                <div style="width: 32px; height: 32px; border-radius: 8px; background: var(--ink-1); color: var(--brass); display: flex; align-items: center; justify-content: center; font-size: 14px;">🛡</div>
+                <div>
+                  <div style="font-size: 14px; font-weight: 600; color: var(--ink-1);">公司风险监控</div>
+                  <div style="font-size: 11px; color: var(--ink-3);">风险预警官 · 全量客户实时扫描</div>
+                </div>
+              </div>
+              <button class="btn-ghost" onclick="switchView('agent-risk')">打开智能体 →</button>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 12px; margin-bottom: 16px;">
+              <div style="text-align: center; padding: 12px; background: var(--canvas); border-radius: var(--r);">
+                <div style="font-size: 22px; font-weight: 700; color: var(--ink-1);">234 家</div>
+                <div style="font-size: 11px; color: var(--ink-3); margin-top: 2px;">监控客户</div>
+                <div style="font-size: 10px; color: var(--ink-2); margin-top: 2px;">全量</div>
+              </div>
+              <div style="text-align: center; padding: 12px; background: var(--canvas); border-radius: var(--r);">
+                <div style="font-size: 22px; font-weight: 700; color: var(--danger);">5 家</div>
+                <div style="font-size: 11px; color: var(--ink-3); margin-top: 2px;">高风险</div>
+                <div style="font-size: 10px; color: var(--ink-2); margin-top: 2px;">¥87万敞口</div>
+              </div>
+              <div style="text-align: center; padding: 12px; background: var(--canvas); border-radius: var(--r);">
+                <div style="font-size: 22px; font-weight: 700; color: var(--brass);">12 家</div>
+                <div style="font-size: 11px; color: var(--ink-3); margin-top: 2px;">中风险</div>
+                <div style="font-size: 10px; color: var(--ink-2); margin-top: 2px;">¥124万敞口</div>
+              </div>
+              <div style="text-align: center; padding: 12px; background: var(--canvas); border-radius: var(--r);">
+                <div style="font-size: 22px; font-weight: 700; color: var(--success);">217 家</div>
+                <div style="font-size: 11px; color: var(--ink-3); margin-top: 2px;">低风险</div>
+                <div style="font-size: 10px; color: var(--ink-2); margin-top: 2px;">正常</div>
+              </div>
+            </div>
+
+            <div style="font-size: 11px; color: var(--ink-3); margin-bottom: 8px;">本月触发事件</div>
+            <div style="display: flex; flex-direction: column; gap: 6px;">
+              <div style="display: flex; align-items: center; padding: 8px 12px; background: rgba(185, 52, 44, 0.06); border: 1px solid rgba(185, 52, 44, 0.2); border-radius: var(--r-sm); font-size: 12px;">
+                <span style="margin-right: 8px;">🚨</span>
+                <span style="flex: 1; color: var(--ink-2);">苏州金鹏</span>
+                <span style="color: var(--danger); margin-right: 12px;">税务非正常户 · ¥96万敞口</span>
+                <span style="color: var(--ink-1); cursor: pointer;">[处置]</span>
+              </div>
+              <div style="display: flex; align-items: center; padding: 8px 12px; background: rgba(140, 106, 58, 0.08); border: 1px solid rgba(140, 106, 58, 0.2); border-radius: var(--r-sm); font-size: 12px;">
+                <span style="margin-right: 8px;">⚠</span>
+                <span style="flex: 1; color: var(--ink-2);">浙江光华</span>
+                <span style="color: var(--brass); margin-right: 12px;">法人变更 · ¥178万敞口</span>
+                <span style="color: var(--ink-1); cursor: pointer;">[处置]</span>
+              </div>
+              <div style="display: flex; align-items: center; padding: 8px 12px; background: rgba(140, 106, 58, 0.08); border: 1px solid rgba(140, 106, 58, 0.2); border-radius: var(--r-sm); font-size: 12px;">
+                <span style="margin-right: 8px;">⚠</span>
+                <span style="flex: 1; color: var(--ink-2);">上海新天</span>
+                <span style="color: var(--brass); margin-right: 12px;">主数据缺失 23 项需补全</span>
+                <span style="color: var(--ink-1); cursor: pointer;">[补全]</span>
+              </div>
+              <div style="display: flex; align-items: center; padding: 8px 12px; background: var(--canvas); border-radius: var(--r-sm); font-size: 12px;">
+                <span style="margin-right: 8px;">ℹ</span>
+                <span style="flex: 1; color: var(--ink-2);">杭州华诚</span>
+                <span style="color: var(--ink-3); margin-right: 12px;">工商地址变更 · 无关税风险</span>
+                <span style="color: var(--ink-1); cursor: pointer;">[关注]</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 今日定时简报 -->
+          <div style="background: var(--paper); border: 1px solid var(--line); border-radius: var(--r-lg); padding: 16px 20px; margin-bottom: 24px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+              <div style="font-size: 12px; font-weight: 600; color: var(--ink-1);">⏰ 今日定时简报</div>
+              <button class="btn-ghost">查看全部 →</button>
+            </div>
+            <div style="display: flex; gap: 12px;">
+              <div style="flex: 1; display: flex; gap: 10px; align-items: center; padding: 10px 14px; background: var(--canvas); border-radius: var(--r); font-size: 12px;">
+                <span style="color: var(--success);">✓</span>
+                <span style="flex: 1;">09:00 每日风险扫描</span>
+                <span style="color: var(--ink-3); font-size: 11px;">触发 5 家预警</span>
+              </div>
+              <div style="flex: 1; display: flex; gap: 10px; align-items: center; padding: 10px 14px; background: var(--canvas); border-radius: var(--r); font-size: 12px;">
+                <span style="color: var(--ink-3);">◯</span>
+                <span style="flex: 1;">17:00 周末应收提醒</span>
+                <span style="color: var(--brass); font-size: 11px;">今晚 17:00 执行</span>
+              </div>
+              <div style="flex: 1; display: flex; gap: 10px; align-items: center; padding: 10px 14px; background: var(--canvas); border-radius: var(--r); font-size: 12px;">
+                <span style="color: var(--ink-3);">◯</span>
+                <span style="flex: 1;">09:00 每日认证率盘点</span>
+                <span style="color: var(--ink-3); font-size: 11px;">明天执行</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ===== 视图：新建任务（云升风格：中央 + 输入区） ===== -->
+      <div class="view-panel" data-view-panel="new-task">
+        <div style="display: flex; flex-direction: column; height: calc(100vh - 60px);">
+          <!-- 顶部 toolbar -->
+          <div style="background: var(--paper); border-bottom: 1px solid var(--line); padding: 14px 24px; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0;">
+            <div style="display: flex; align-items: center; gap: 12px;">
+              <div style="font-size: 14px; font-weight: 600; color: var(--ink-1);">＋ 新任务</div>
+              <span style="font-size: 11px; padding: 3px 8px; background: var(--line-2); border-radius: 10px; color: var(--ink-2);">智能开票专员</span>
+            </div>
+            <div style="display: flex; gap: 6px; font-size: 11px; color: var(--ink-3);">
+              <span style="padding: 4px 10px; border-radius: var(--r-sm); cursor: pointer;">对话管理</span>
+              <span style="padding: 4px 10px; border-radius: var(--r-sm); cursor: pointer;">Session log ↓</span>
+            </div>
+          </div>
+
+          <!-- 中央欢迎区（云升风格：大 logo + 标语 + 快捷按钮） -->
+          <div style="flex: 1; overflow-y: auto; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px 24px; background: var(--canvas);">
+            <div style="text-align: center; max-width: 600px;">
+              <div style="display: flex; justify-content: center; margin-bottom: 12px;">
+                <div style="width: 56px; height: 56px; background: var(--ink-1); border-radius: 14px; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                  <div style="color: var(--brass); font-size: 16px; font-weight: 700; letter-spacing: -0.5px;">AI</div>
+                  <div style="color: var(--brass); font-size: 9px; letter-spacing: 1px;">财</div>
+                </div>
+              </div>
+              <div style="font-size: 18px; font-weight: 600; color: var(--ink-1); margin-bottom: 6px;">YUNRISE · 数字员工工作台</div>
+              <div style="font-size: 14px; color: var(--ink-2); margin-bottom: 4px;">企业智能，自然生长</div>
+              <div style="font-size: 13px; color: var(--ink-3); margin-bottom: 24px;">用一句话安排工作，数字员工负责办完、办对、留痕。</div>
+
+              <!-- 5 个快捷操作 -->
+              <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-bottom: 20px;">
+                <div style="padding: 8px 14px; background: var(--paper); border: 1px solid var(--line); border-radius: var(--r); font-size: 12px; color: var(--ink-2); cursor: pointer;">⚡ 开票晨检</div>
+                <div style="padding: 8px 14px; background: var(--paper); border: 1px solid var(--line); border-radius: var(--r); font-size: 12px; color: var(--ink-2); cursor: pointer;">🔍 发票查验</div>
+                <div style="padding: 8px 14px; background: var(--paper); border: 1px solid var(--line); border-radius: var(--r); font-size: 12px; color: var(--ink-2); cursor: pointer;">📅 申报日历</div>
+                <div style="padding: 8px 14px; background: var(--paper); border: 1px solid var(--line); border-radius: var(--r); font-size: 12px; color: var(--ink-2); cursor: pointer;">🛡 风险周报</div>
+                <div style="padding: 8px 14px; background: var(--paper); border: 1px solid var(--line); border-radius: var(--r); font-size: 12px; color: var(--ink-2); cursor: pointer;">📊 销项数据看板</div>
+              </div>
+
+              <div style="font-size: 11px; color: var(--ink-3);">
+                今天还没有定时简报 · <span style="color: var(--ink-1); cursor: pointer; text-decoration: underline;">看定时任务</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 底部输入区（云升风格：多 chip 选区 + textarea + 发送） -->
+          <div style="background: var(--paper); border-top: 1px solid var(--line); padding: 12px 24px 16px; flex-shrink: 0;">
+            <div style="max-width: 760px; margin: 0 auto;">
+              <!-- 顶部 chip 选择区（连接器 / 智能体 / 写入区） -->
+              <div style="display: flex; gap: 6px; margin-bottom: 8px; flex-wrap: wrap;">
+                <span style="font-size: 11px; padding: 4px 10px; background: var(--line-2); border-radius: 10px; color: var(--ink-2); cursor: pointer; display: inline-flex; align-items: center; gap: 4px;">
+                  📁 票易通 <u style="font-size: 9px;">▾</u>
+                </span>
+                <span style="font-size: 11px; padding: 4px 10px; background: var(--line-2); border-radius: 10px; color: var(--ink-2); cursor: pointer; display: inline-flex; align-items: center; gap: 4px;">
+                  🤖 开票助理 <u style="font-size: 9px;">▾</u>
+                </span>
+                <span style="font-size: 11px; padding: 4px 10px; background: var(--line-2); border-radius: 10px; color: var(--ink-2); cursor: pointer; display: inline-flex; align-items: center; gap: 4px;">
+                  🛡 工作区写入 <u style="font-size: 9px;">▾</u>
+                </span>
+                <span style="font-size: 11px; padding: 4px 10px; background: var(--line-2); border-radius: 10px; color: var(--ink-2); cursor: pointer; display: inline-flex; align-items: center; gap: 4px; margin-left: auto;">
+                  📕 知识 <u style="font-size: 9px;">▾</u>
+                </span>
+                <span style="font-size: 11px; padding: 4px 10px; background: var(--ink-2); color: var(--paper); border-radius: 10px; cursor: pointer; display: inline-flex; align-items: center; gap: 4px;">
+                  Grok 4.6 <u style="font-size: 9px;">▾</u>
+                </span>
+              </div>
+
+              <!-- 输入区 + 发送按钮 -->
+              <div style="display: flex; gap: 8px; align-items: flex-end; background: var(--canvas); border: 1px solid var(--line); border-radius: var(--r); padding: 8px 12px;">
+                <textarea placeholder="给智能体发消息，例如：帮我补全 5 家客户的主数据，然后按主数据自动开票" rows="2" style="flex: 1; background: transparent; border: none; outline: none; resize: none; font-size: 13px; font-family: inherit; line-height: 1.5;"></textarea>
+                <button class="btn-primary" style="height: 32px; padding: 0 14px; display: flex; align-items: center; gap: 4px;">↑ 发送</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== 视图：技能 ===== -->
+      <div class="view-panel" data-view-panel="skill">
+        <div style="padding: 24px;">
+          <div style="background: var(--paper); border: 1px solid var(--line); border-radius: var(--r-lg); padding: 24px;">
+            <div style="font-size: 16px; font-weight: 600; color: var(--ink-1); margin-bottom: 16px;">技能</div>
+            <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px;">
+              <div style="border: 1px solid var(--line); border-radius: var(--r); padding: 14px;">
+                <div style="font-size: 13px; font-weight: 600; color: var(--ink-1); margin-bottom: 6px;">🧩 自动开票</div>
+                <div style="font-size: 11px; color: var(--ink-3); margin-bottom: 8px;">调用乐企通道批量开票</div>
+                <div style="font-size: 10px; color: var(--ink-3);">已用 287 次</div>
+              </div>
+              <div style="border: 1px solid var(--line); border-radius: var(--r); padding: 14px;">
+                <div style="font-size: 13px; font-weight: 600; color: var(--ink-1); margin-bottom: 6px;">🛡 风险扫描</div>
+                <div style="font-size: 11px; color: var(--ink-3); margin-bottom: 8px;">多源数据扫描客户异常</div>
+                <div style="font-size: 10px; color: var(--ink-3);">已用 12 次</div>
+              </div>
+              <div style="border: 1px solid var(--line); border-radius: var(--r); padding: 14px;">
+                <div style="font-size: 13px; font-weight: 600; color: var(--ink-1); margin-bottom: 6px;">🔍 主数据补全</div>
+                <div style="font-size: 11px; color: var(--ink-3); margin-bottom: 8px;">从工商接口拉取客户信息</div>
+                <div style="font-size: 10px; color: var(--ink-3);">已用 1,412 次</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== 视图：历史对话 1（上海永胜·主数据确认） ===== -->
+      <div class="view-panel" data-view-panel="history-1">
+        <div style="display: flex; flex-direction: column; height: calc(100vh - 60px);">
+          <!-- 对话头部 -->
+          <div style="background: var(--paper); border-bottom: 1px solid var(--line); padding: 14px 24px; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0;">
+            <div>
+              <div style="font-size: 14px; font-weight: 600; color: var(--ink-1);">💬 上海永胜包装 · 主数据确认</div>
+              <div style="font-size: 11px; color: var(--ink-3); margin-top: 2px;">2026-09-12 14:32 · 智能开票专员 · 已完成</div>
+            </div>
+            <button class="btn-ghost">查看执行结果</button>
+          </div>
+
+          <!-- 对话气泡区 -->
+          <div style="flex: 1; overflow-y: auto; padding: 24px; background: var(--canvas);">
+            <div style="max-width: 760px; margin: 0 auto; display: flex; flex-direction: column; gap: 16px;">
+
+              <div style="display: flex; gap: 10px;">
+                <div style="width: 28px; height: 28px; border-radius: 14px; background: var(--ink-1); color: var(--paper); display: flex; align-items: center; justify-content: center; font-size: 11px; flex-shrink: 0;">AI</div>
+                <div style="background: var(--paper); border-radius: var(--r); padding: 12px 16px; font-size: 13px; line-height: 1.7; flex: 1; border: 1px solid var(--line-2);">
+                  检测到客户「上海永胜包装材料有限公司」税号
+                  <code style="background: var(--line); padding: 1px 5px; border-radius: 3px; font-size: 11px;">91310112MA00AAA01X</code>
+                  有 4 项主数据缺失（地址/银行/电话/邮箱），是否允许我从工商接口拉取补充？
+                </div>
+              </div>
+
+              <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                <div style="background: var(--line-2); border-radius: var(--r); padding: 12px 16px; font-size: 13px; line-height: 1.7; max-width: 60%;">确认补充，立即开票 ¥ 124,500</div>
+                <div style="width: 28px; height: 28px; border-radius: 14px; background: var(--ink-2); color: var(--paper); display: flex; align-items: center; justify-content: center; font-size: 11px; flex-shrink: 0;">杨</div>
+              </div>
+
+              <div style="display: flex; gap: 10px;">
+                <div style="width: 28px; height: 28px; border-radius: 14px; background: var(--ink-1); color: var(--paper); display: flex; align-items: center; justify-content: center; font-size: 11px; flex-shrink: 0;">AI</div>
+                <div style="background: var(--paper); border-radius: var(--r); padding: 12px 16px; font-size: 13px; line-height: 1.7; flex: 1; border: 1px solid var(--line-2);">
+                  ✅ 已从工商接口拉取客户信息，主数据补充完毕（耗时 0.3 秒）。
+                  <div style="margin-top: 8px; padding: 10px 12px; background: var(--canvas); border-radius: var(--r-sm); font-size: 12px;">
+                    <div><b>地址</b>: 上海市浦东新区张江路 188 号</div>
+                    <div><b>开户行</b>: 招商银行上海分行</div>
+                    <div><b>电话</b>: 021-5078XXXX</div>
+                    <div><b>邮箱</b>: yongsheng@example.com</div>
+                  </div>
+                </div>
+              </div>
+
+              <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                <div style="background: var(--line-2); border-radius: var(--r); padding: 12px 16px; font-size: 13px; line-height: 1.7; max-width: 60%;">好的，立即开票</div>
+                <div style="width: 28px; height: 28px; border-radius: 14px; background: var(--ink-2); color: var(--paper); display: flex; align-items: center; justify-content: center; font-size: 11px; flex-shrink: 0;">杨</div>
+              </div>
+
+              <div style="display: flex; gap: 10px;">
+                <div style="width: 28px; height: 28px; border-radius: 14px; background: var(--ink-1); color: var(--paper); display: flex; align-items: center; justify-content: center; font-size: 11px; flex-shrink: 0;">AI</div>
+                <div style="background: var(--paper); border-radius: var(--r); padding: 12px 16px; font-size: 13px; line-height: 1.7; flex: 1; border: 1px solid var(--line-2);">
+                  ✅ 已调用乐企通道开具 13 张发票，发票号 …190220901 - …190220913。
+                  <div style="margin-top: 8px; padding: 8px 12px; background: var(--canvas); border-radius: var(--r-sm); font-size: 12px; color: var(--ink-2);">
+                    <div>共 13 张，含税合计 <b>¥ 124,500</b></div>
+                    <div>耗时 2.1 秒</div>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- 输入区 -->
+          <div style="background: var(--paper); border-top: 1px solid var(--line); padding: 12px 24px 16px; flex-shrink: 0;">
+            <div style="max-width: 760px; margin: 0 auto;">
+              <div style="display: flex; gap: 8px; margin-bottom: 8px; flex-wrap: wrap;">
+                <span style="font-size: 11px; padding: 4px 10px; border-radius: 10px; background: var(--line-2); color: var(--ink-2); cursor: pointer;">📋 查看 13 张发票号</span>
+                <span style="font-size: 11px; padding: 4px 10px; border-radius: 10px; background: var(--line-2); color: var(--ink-2); cursor: pointer;">🔄 重新执行</span>
+                <span style="font-size: 11px; padding: 4px 10px; border-radius: 10px; background: var(--line-2); color: var(--ink-2); cursor: pointer;">📤 导出记录</span>
+              </div>
+              <div style="display: flex; gap: 8px; align-items: flex-end; background: var(--canvas); border: 1px solid var(--line); border-radius: var(--r); padding: 8px 12px;">
+                <textarea placeholder="继续对话（这条对话已结束）" rows="1" style="flex: 1; background: transparent; border: none; outline: none; resize: none; font-size: 13px; font-family: inherit;"></textarea>
+                <button class="btn-primary" style="height: 32px; padding: 0 14px;">发送</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      <!-- ===== 视图：历史对话 2（浙江光华·风险处置） ===== -->
+      <div class="view-panel" data-view-panel="history-2">
+        <div style="display: flex; flex-direction: column; height: calc(100vh - 60px);">
+          <div style="background: var(--paper); border-bottom: 1px solid var(--line); padding: 14px 24px; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0;">
+            <div>
+              <div style="font-size: 14px; font-weight: 600; color: var(--ink-1);">💬 浙江光华 · 风险处置</div>
+              <div style="font-size: 11px; color: var(--ink-3); margin-top: 2px;">2026-09-12 13:18 · 风险预警官 · 已完成</div>
+            </div>
+            <button class="btn-ghost">查看执行结果</button>
+          </div>
+          <div style="flex: 1; overflow-y: auto; padding: 24px; background: var(--canvas);">
+            <div style="max-width: 760px; margin: 0 auto; display: flex; flex-direction: column; gap: 16px;">
+              <div style="display: flex; gap: 10px;"><div style="width: 28px; height: 28px; border-radius: 14px; background: var(--ink-1); color: var(--paper); display: flex; align-items: center; justify-content: center; font-size: 11px; flex-shrink: 0;">AI</div><div style="background: var(--paper); border-radius: var(--r); padding: 12px 16px; font-size: 13px; line-height: 1.7; flex: 1; border: 1px solid var(--line-2);">⚠️ 检测到客户「浙江光华印务有限公司」法定代表人变更（张三→李四，3 天前）。该客户当前欠款 ¥178万，建议立即调整账期从 90 天到 30 天。</div></div>
+              <div style="display: flex; gap: 10px; justify-content: flex-end;"><div style="background: var(--line-2); border-radius: var(--r); padding: 12px 16px; font-size: 13px; line-height: 1.7; max-width: 60%;">李四是什么人？和原法人有关系吗？</div><div style="width: 28px; height: 28px; border-radius: 14px; background: var(--ink-2); color: var(--paper); display: flex; align-items: center; justify-content: center; font-size: 11px; flex-shrink: 0;">杨</div></div>
+              <div style="display: flex; gap: 10px;"><div style="width: 28px; height: 28px; border-radius: 14px; background: var(--ink-1); color: var(--paper); display: flex; align-items: center; justify-content: center; font-size: 11px; flex-shrink: 0;">AI</div><div style="background: var(--paper); border-radius: var(--r); padding: 12px 16px; font-size: 13px; line-height: 1.7; flex: 1; border: 1px solid var(--line-2);">查询结果：李四与原法人张三无关联，是新投资人接手。工商变更公告中提到「经营策略调整」。历史合作 24 个月未出现坏账，但法人变更属于高风险信号。</div></div>
+              <div style="display: flex; gap: 10px; justify-content: flex-end;"><div style="background: var(--line-2); border-radius: var(--r); padding: 12px 16px; font-size: 13px; line-height: 1.7; max-width: 60%;">调整账期到 30 天，同时暂缓新增发货，等新法人资金到位再恢复</div><div style="width: 28px; height: 28px; border-radius: 14px; background: var(--ink-2); color: var(--paper); display: flex; align-items: center; justify-content: center; font-size: 11px; flex-shrink: 0;">杨</div></div>
+              <div style="display: flex; gap: 10px;"><div style="width: 28px; height: 28px; border-radius: 14px; background: var(--ink-1); color: var(--paper); display: flex; align-items: center; justify-content: center; font-size: 11px; flex-shrink: 0;">AI</div><div style="background: var(--paper); border-radius: var(--r); padding: 12px 16px; font-size: 13px; line-height: 1.7; flex: 1; border: 1px solid var(--line-2);">✅ 已完成：<br>• 账期从 90 天调整为 30 天（合同条款已更新）<br>• 暂缓新增发货（需财务主管签字确认）<br>• 风险预警官监控该客户动态，3 天后自动复查</div></div>
+            </div>
+          </div>
+          <div style="background: var(--paper); border-top: 1px solid var(--line); padding: 12px 24px 16px; flex-shrink: 0;">
+            <div style="max-width: 760px; margin: 0 auto;">
+              <div style="display: flex; gap: 8px; margin-bottom: 8px;">
+                <span style="font-size: 11px; padding: 4px 10px; border-radius: 10px; background: var(--line-2); color: var(--ink-2); cursor: pointer;">📋 查看明细</span>
+                <span style="font-size: 11px; padding: 4px 10px; border-radius: 10px; background: var(--line-2); color: var(--ink-2); cursor: pointer;">🔄 重新执行</span>
+              </div>
+              <div style="display: flex; gap: 8px; align-items: flex-end; background: var(--canvas); border: 1px solid var(--line); border-radius: var(--r); padding: 8px 12px;">
+                <textarea placeholder="继续对话" rows="1" style="flex: 1; background: transparent; border: none; outline: none; resize: none; font-size: 13px; font-family: inherit;"></textarea>
+                <button class="btn-primary" style="height: 32px; padding: 0 14px;">发送</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- ===== 视图：历史对话 3（苏州金鹏·停止开票） ===== -->
+      <div class="view-panel" data-view-panel="history-3">
+        <div style="display: flex; flex-direction: column; height: calc(100vh - 60px);">
+          <div style="background: var(--paper); border-bottom: 1px solid var(--line); padding: 14px 24px; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0;">
+            <div>
+              <div style="font-size: 14px; font-weight: 600; color: var(--ink-1);">💬 苏州金鹏 · 停止开票</div>
+              <div style="font-size: 11px; color: var(--ink-3); margin-top: 2px;">2026-09-12 11:45 · 风险预警官 · 已完成</div>
+            </div>
+            <button class="btn-ghost">查看执行结果</button>
+          </div>
+          <div style="flex: 1; overflow-y: auto; padding: 24px; background: var(--canvas);">
+            <div style="max-width: 760px; margin: 0 auto; display: flex; flex-direction: column; gap: 16px;">
+              <div style="display: flex; gap: 10px;"><div style="width: 28px; height: 28px; border-radius: 14px; background: var(--ink-1); color: var(--paper); display: flex; align-items: center; justify-content: center; font-size: 11px; flex-shrink: 0;">AI</div><div style="background: var(--paper); border-radius: var(--r); padding: 12px 16px; font-size: 13px; line-height: 1.7; flex: 1; border: 1px solid var(--line-2);">🚨 紧急：「苏州金鹏贸易有限公司」5 天前被认定为<b>税务非正常户</b>，若继续开票将面临进项转出风险 ¥96万。建议立即停止合作。</div></div>
+              <div style="display: flex; gap: 10px; justify-content: flex-end;"><div style="background: var(--line-2); border-radius: var(--r); padding: 12px 16px; font-size: 13px; line-height: 1.7; max-width: 60%;">确认停止开票，但现在他们还有 96 万的应收账款，怎么处理？</div><div style="width: 28px; height: 28px; border-radius: 14px; background: var(--ink-2); color: var(--paper); display: flex; align-items: center; justify-content: center; font-size: 11px; flex-shrink: 0;">杨</div></div>
+              <div style="display: flex; gap: 10px;"><div style="width: 28px; height: 28px; border-radius: 14px; background: var(--ink-1); color: var(--paper); display: flex; align-items: center; justify-content: center; font-size: 11px; flex-shrink: 0;">AI</div><div style="background: var(--paper); border-radius: var(--r); padding: 12px 16px; font-size: 13px; line-height: 1.7; flex: 1; border: 1px solid var(--line-2);">已制定回款保护方案：<br>• 立即停止开具新发票<br>• 冻结待开发票 12 张（¥48万）<br>• 启动法务催收程序<br>• 同时排查其他关联客户<br><br>预计 30 天内可追回 ¥70万</div></div>
+              <div style="display: flex; gap: 10px; justify-content: flex-end;"><div style="background: var(--line-2); border-radius: var(--r); padding: 12px 16px; font-size: 13px; line-height: 1.7; max-width: 60%;">按方案执行，发通知给该客户的采购员</div><div style="width: 28px; height: 28px; border-radius: 14px; background: var(--ink-2); color: var(--paper); display: flex; align-items: center; justify-content: center; font-size: 11px; flex-shrink: 0;">杨</div></div>
+              <div style="display: flex; gap: 10px;"><div style="width: 28px; height: 28px; border-radius: 14px; background: var(--ink-1); color: var(--paper); display: flex; align-items: center; justify-content: center; font-size: 11px; flex-shrink: 0;">AI</div><div style="background: var(--paper); border-radius: var(--r); padding: 12px 16px; font-size: 13px; line-height: 1.7; flex: 1; border: 1px solid var(--line-2);">✅ 已发送：<br>• 通知已发送给采购员王明（联系方式已存档）<br>• 法务催收已发起，预计 7 个工作日内有反馈<br>• 系统将持续监控该客户的工商/税务变化</div></div>
+            </div>
+          </div>
+          <div style="background: var(--paper); border-top: 1px solid var(--line); padding: 12px 24px 16px; flex-shrink: 0;">
+            <div style="max-width: 760px; margin: 0 auto;">
+              <div style="display: flex; gap: 8px; margin-bottom: 8px;">
+                <span style="font-size: 11px; padding: 4px 10px; border-radius: 10px; background: var(--line-2); color: var(--ink-2); cursor: pointer;">📋 查看明细</span>
+                <span style="font-size: 11px; padding: 4px 10px; border-radius: 10px; background: var(--line-2); color: var(--ink-2); cursor: pointer;">🔄 重新执行</span>
+              </div>
+              <div style="display: flex; gap: 8px; align-items: flex-end; background: var(--canvas); border: 1px solid var(--line); border-radius: var(--r); padding: 8px 12px;">
+                <textarea placeholder="继续对话" rows="1" style="flex: 1; background: transparent; border: none; outline: none; resize: none; font-size: 13px; font-family: inherit;"></textarea>
+                <button class="btn-primary" style="height: 32px; padding: 0 14px;">发送</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- ===== 视图：历史对话 4（5 家主数据批量补全） ===== -->
+      <div class="view-panel" data-view-panel="history-4">
+        <div style="display: flex; flex-direction: column; height: calc(100vh - 60px);">
+          <div style="background: var(--paper); border-bottom: 1px solid var(--line); padding: 14px 24px; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0;">
+            <div>
+              <div style="font-size: 14px; font-weight: 600; color: var(--ink-1);">💬 5 家主数据批量补全</div>
+              <div style="font-size: 11px; color: var(--ink-3); margin-top: 2px;">2026-09-12 10:21 · 智能开票专员 · 已完成</div>
+            </div>
+            <button class="btn-ghost">查看执行结果</button>
+          </div>
+          <div style="flex: 1; overflow-y: auto; padding: 24px; background: var(--canvas);">
+            <div style="max-width: 760px; margin: 0 auto; display: flex; flex-direction: column; gap: 16px;">
+              <div style="display: flex; gap: 10px;"><div style="width: 28px; height: 28px; border-radius: 14px; background: var(--ink-1); color: var(--paper); display: flex; align-items: center; justify-content: center; font-size: 11px; flex-shrink: 0;">AI</div><div style="background: var(--paper); border-radius: var(--r); padding: 12px 16px; font-size: 13px; line-height: 1.7; flex: 1; border: 1px solid var(--line-2);">🔧 检测到 5 家客户共 13 项主数据缺失。是否启用<b>批量补全</b>（从工商接口拉取，预计 5 分钟内完成）？</div></div>
+              <div style="display: flex; gap: 10px; justify-content: flex-end;"><div style="background: var(--line-2); border-radius: var(--r); padding: 12px 16px; font-size: 13px; line-height: 1.7; max-width: 60%;">启用</div><div style="width: 28px; height: 28px; border-radius: 14px; background: var(--ink-2); color: var(--paper); display: flex; align-items: center; justify-content: center; font-size: 11px; flex-shrink: 0;">杨</div></div>
+              <div style="display: flex; gap: 10px;"><div style="width: 28px; height: 28px; border-radius: 14px; background: var(--ink-1); color: var(--paper); display: flex; align-items: center; justify-content: center; font-size: 11px; flex-shrink: 0;">AI</div><div style="background: var(--paper); border-radius: var(--r); padding: 12px 16px; font-size: 13px; line-height: 1.7; flex: 1; border: 1px solid var(--line-2);">正在批量拉取工商数据...已完成。<br><br>补全清单：<br>• 上海新天包装：地址/银行 (2 项)<br>• 深圳弘益纸业：地址/银行/电话 (3 项)<br>• 苏州金鹏：电话/邮箱 (2 项，已停止开票)<br>• 杭州华诚：地址/银行/电话 (3 项)<br>• 宁波永和：地址/银行 (3 项)<br><br>等待财务一键确认即可启用。</div></div>
+              <div style="display: flex; gap: 10px; justify-content: flex-end;"><div style="background: var(--line-2); border-radius: var(--r); padding: 12px 16px; font-size: 13px; line-height: 1.7; max-width: 60%;">全部确认</div><div style="width: 28px; height: 28px; border-radius: 14px; background: var(--ink-2); color: var(--paper); display: flex; align-items: center; justify-content: center; font-size: 11px; flex-shrink: 0;">杨</div></div>
+              <div style="display: flex; gap: 10px;"><div style="width: 28px; height: 28px; border-radius: 14px; background: var(--ink-1); color: var(--paper); display: flex; align-items: center; justify-content: center; font-size: 11px; flex-shrink: 0;">AI</div><div style="background: var(--paper); border-radius: var(--r); padding: 12px 16px; font-size: 13px; line-height: 1.7; flex: 1; border: 1px solid var(--line-2);">✅ 已确认 13 项主数据补全，涉及 ¥96,800 待开票据预计可在月底申报前完成开票。</div></div>
+            </div>
+          </div>
+          <div style="background: var(--paper); border-top: 1px solid var(--line); padding: 12px 24px 16px; flex-shrink: 0;">
+            <div style="max-width: 760px; margin: 0 auto;">
+              <div style="display: flex; gap: 8px; margin-bottom: 8px;">
+                <span style="font-size: 11px; padding: 4px 10px; border-radius: 10px; background: var(--line-2); color: var(--ink-2); cursor: pointer;">📋 查看明细</span>
+                <span style="font-size: 11px; padding: 4px 10px; border-radius: 10px; background: var(--line-2); color: var(--ink-2); cursor: pointer;">🔄 重新执行</span>
+              </div>
+              <div style="display: flex; gap: 8px; align-items: flex-end; background: var(--canvas); border: 1px solid var(--line); border-radius: var(--r); padding: 8px 12px;">
+                <textarea placeholder="继续对话" rows="1" style="flex: 1; background: transparent; border: none; outline: none; resize: none; font-size: 13px; font-family: inherit;"></textarea>
+                <button class="btn-primary" style="height: 32px; padding: 0 14px;">发送</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- ===== 视图：历史对话 5（月初认证率盘点） ===== -->
+      <div class="view-panel" data-view-panel="history-5">
+        <div style="display: flex; flex-direction: column; height: calc(100vh - 60px);">
+          <div style="background: var(--paper); border-bottom: 1px solid var(--line); padding: 14px 24px; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0;">
+            <div>
+              <div style="font-size: 14px; font-weight: 600; color: var(--ink-1);">💬 月初认证率盘点</div>
+              <div style="font-size: 11px; color: var(--ink-3); margin-top: 2px;">2026-09-11 17:30 · 智能开票专员 · 已完成</div>
+            </div>
+            <button class="btn-ghost">查看执行结果</button>
+          </div>
+          <div style="flex: 1; overflow-y: auto; padding: 24px; background: var(--canvas);">
+            <div style="max-width: 760px; margin: 0 auto; display: flex; flex-direction: column; gap: 16px;">
+              <div style="display: flex; gap: 10px;"><div style="width: 28px; height: 28px; border-radius: 14px; background: var(--ink-1); color: var(--paper); display: flex; align-items: center; justify-content: center; font-size: 11px; flex-shrink: 0;">AI</div><div style="background: var(--paper); border-radius: var(--r); padding: 12px 16px; font-size: 13px; line-height: 1.7; flex: 1; border: 1px solid var(--line-2);">📊 8 月认证率盘点结果：<br><br>• 8 月整体认证率：<b>58.3%</b>（环比 ↑5.2%）<br>• 高危超期：3 张（含税 ¥34.2万）<br>• 已处理：128 张<br>• 待处理：194 张<br><br>建议本月开启「风险客户自动暂停开票」规则，预计认证率可提升至 78%。</div></div>
+              <div style="display: flex; gap: 10px; justify-content: flex-end;"><div style="background: var(--line-2); border-radius: var(--r); padding: 12px 16px; font-size: 13px; line-height: 1.7; max-width: 60%;">开启规则，但保留财务最后确认权</div><div style="width: 28px; height: 28px; border-radius: 14px; background: var(--ink-2); color: var(--paper); display: flex; align-items: center; justify-content: center; font-size: 11px; flex-shrink: 0;">杨</div></div>
+              <div style="display: flex; gap: 10px;"><div style="width: 28px; height: 28px; border-radius: 14px; background: var(--ink-1); color: var(--paper); display: flex; align-items: center; justify-content: center; font-size: 11px; flex-shrink: 0;">AI</div><div style="background: var(--paper); border-radius: var(--r); padding: 12px 16px; font-size: 13px; line-height: 1.7; flex: 1; border: 1px solid var(--line-2);">✅ 已开启规则，配置如下：<br>• 法人变更/税务异常 → 自动暂停<br>• 暂停结果需财务确认后生效<br>• 暂停超时 24h 自动恢复（防止误伤）</div></div>
+            </div>
+          </div>
+          <div style="background: var(--paper); border-top: 1px solid var(--line); padding: 12px 24px 16px; flex-shrink: 0;">
+            <div style="max-width: 760px; margin: 0 auto;">
+              <div style="display: flex; gap: 8px; margin-bottom: 8px;">
+                <span style="font-size: 11px; padding: 4px 10px; border-radius: 10px; background: var(--line-2); color: var(--ink-2); cursor: pointer;">📋 查看明细</span>
+                <span style="font-size: 11px; padding: 4px 10px; border-radius: 10px; background: var(--line-2); color: var(--ink-2); cursor: pointer;">🔄 重新执行</span>
+              </div>
+              <div style="display: flex; gap: 8px; align-items: flex-end; background: var(--canvas); border: 1px solid var(--line); border-radius: var(--r); padding: 8px 12px;">
+                <textarea placeholder="继续对话" rows="1" style="flex: 1; background: transparent; border: none; outline: none; resize: none; font-size: 13px; font-family: inherit;"></textarea>
+                <button class="btn-primary" style="height: 32px; padding: 0 14px;">发送</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      </div>
+
+      <!-- ===== 视图：定时任务 1 ===== -->
+      <div class="view-panel" data-view-panel="schedule-1">
+        <div style="padding: 24px;">
+          <div style="background: var(--paper); border: 1px solid var(--line); border-radius: var(--r-lg); padding: 24px;">
+            <div style="font-size: 16px; font-weight: 600; color: var(--ink-1); margin-bottom: 16px;">⏰ 每日风险扫描</div>
+            <div style="display: flex; gap: 16px; font-size: 12px; color: var(--ink-2); margin-bottom: 16px;">
+              <div><strong style="color: var(--ink-1);">触发时间</strong><br>每天 09:00</div>
+              <div><strong style="color: var(--ink-1);">下次执行</strong><br>明天 09:00</div>
+              <div><strong style="color: var(--ink-1);">执行次数</strong><br>已运行 87 次</div>
+              <div><strong style="color: var(--ink-1);">成功率</strong><br>100%</div>
+            </div>
+            <div style="padding-top: 14px; border-top: 1px solid var(--line-2);">
+              <div style="font-size: 11px; color: var(--ink-3); margin-bottom: 6px;">任务描述</div>
+              <div style="font-size: 13px; color: var(--ink-1); line-height: 1.6;">每日 09:00 自动扫描所有经销商的工商/税务/经营状态，触发预警推送至风险预警官智能体。</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== 视图：工具占位 ===== -->
+      <div class="view-panel" data-view-panel="tool-cap">
+        <div style="padding: 60px 24px; text-align: center; color: var(--ink-3);">
+          <div style="font-size: 48px; margin-bottom: 12px;">🔧</div>
+          <div style="font-size: 14px;">能力中心 · 占位</div>
+        </div>
+      </div>
+      <div class="view-panel" data-view-panel="tool-kb">
+        <div style="padding: 60px 24px; text-align: center; color: var(--ink-3);">
+          <div style="font-size: 48px; margin-bottom: 12px;">📚</div>
+          <div style="font-size: 14px;">知识库 · 占位</div>
+        </div>
+      </div>
+      
+
+      </div><!-- /.views-container -->
+    </div>
+  </main>
+
+</div>
+
+</div>
+
+<!-- AI 依据 Modal -->
+<div class="modal-mask" id="modal-mask" onclick="if(event.target===this) closeModal()">
+  <div class="modal">
+    <div class="modal-header">
+      <div>
+        <div class="modal-title" id="modal-title">AI 依据详情</div>
+        <div class="modal-sub" id="modal-sub">基于 AI 智能体判断</div>
+      </div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body" id="modal-body"></div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeModal()">关闭</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const EVIDENCE = {
+  'event-1': {
+    title: '苏州金鹏贸易 · 税务非正常户 · 风险 92',
+    conclusion: '该客户已被税务机关认定为"税务非正常户"，继续开票将面临进项转出风险 ¥96万。AI 建议立即停止合作。',
+    confidence: 92,
+    confidenceReason: '多源数据交叉验证：工商异常 + 税务非正常 + 5天内风险陡增',
+    chain: [
+      { label: '工商数据扫描', detail: '2026-09-12 检测到"列入经营异常名录"' },
+      { label: '税务数据扫描', detail: '2026-09-11 被认定为"税务非正常户"' },
+      { label: '风险特征匹配', detail: '匹配历史坏账案例 3 项，相似度 87%' },
+      { label: 'AI 综合判定', detail: '高风险，建议立即停止开票' },
+    ],
+    sources: ['工商接口', '税务接口', '历史坏账案例库', '风险特征模型'],
+    related: '关联客户档案、关联发票 96万、关联历史坏账案例 3 个',
+  },
+  'event-2': {
+    title: '浙江光华印务 · 法人变更 + 13 张待开 · 风险 88',
+    conclusion: '客户法人变更后，商业存在异常。结合 13 张待开 ¥178万 应收，AI 建议立即开票+调整账期。',
+    confidence: 88,
+    confidenceReason: '法人变更信号 + 应收规模大 + 距月底申报窗口期紧',
+    chain: [
+      { label: '法人变更检测', detail: '2026-09-10 法定代表人由"张三"变更为"李四"' },
+      { label: '历史行为分析', detail: '该客户过去 12 个月 5 次小额延迟付款' },
+      { label: '应收规模评估', detail: '当前应收 ¥178万，单客户风险敞口过大' },
+      { label: 'AI 判定', detail: '中高位风险，建议"开票+调整账期+密切监控"组合动作' },
+    ],
+    sources: ['工商接口', '历史付款记录', '应收规模分析'],
+    related: '关联发票 13 张、关联客户档案',
+  },
+  'event-3': {
+    title: '上海永胜包装 · 主数据缺项 · 风险 85',
+    conclusion: '客户地址、银行、邮箱等 4 项主数据缺失。AI 已通过工商接口拉取候选，可 0.3 秒完成补全。',
+    confidence: 85,
+    confidenceReason: 'AI 自动补全成功率 98%，人工录入成本 ≈ 4 小时',
+    chain: [
+      { label: '主数据扫描', detail: '该客户税号 9131xxxx 缺地址/银行/电话/邮箱' },
+      { label: '工商接口调用', detail: '返回完整工商登记信息（4 项匹配）' },
+      { label: 'AI 验证', detail: '与历史发票信息核对，100% 匹配' },
+      { label: 'AI 建议', detail: '自动补全 + 人工一键确认' },
+    ],
+    sources: ['工商接口', '历史发票档案'],
+    related: '13 张待开发票、该客户历史 38 张发票档案',
+  },
+  'event-4': {
+    title: '经营预警 · 销售增 18% 但回款率降 2.3pp',
+    conclusion: '"增长不收钱"是经营恶化的早期信号。AI 关联分析：销售增 18% 主要来自 5 家高风险客户，建议暂停发货+调整账期。',
+    confidence: 75,
+    confidenceReason: '历史模式匹配 + 多客户关联分析，但非确定信号',
+    chain: [
+      { label: '销售数据分析', detail: '本月销售 ¥2.34亿，环比 +18%' },
+      { label: '回款数据分析', detail: '回款率 82.9%，环比 -2.3pp' },
+      { label: '客户关联分析', detail: '5 家新增高风险客户贡献了 ¥87万 应收' },
+      { label: 'AI 判定', detail: '疑似"增长不收钱"信号，建议暂停 2 家新增客户发货' },
+    ],
+    sources: ['销售数据', '回款数据', '客户风险评分'],
+    related: '销售明细 234 单、回款明细 184 单、5 家高风险客户档案',
+  },
+  'event-5': {
+    title: '上海林达纸业 · 经营异常 · 风险 68',
+    conclusion: '客户被列入经营异常名录 1 周。当前应收 ¥42万，建议密切监控 30 天，92% 应收可挽回。',
+    confidence: 68,
+    confidenceReason: '经营异常是常见状态，单项不构成立即风险',
+    chain: [
+      { label: '工商数据扫描', detail: '2026-09-09 被列入经营异常名录' },
+      { label: '历史行为分析', detail: '该客户 24 个月合作历史，未出现坏账' },
+      { label: 'AI 判定', detail: '中位风险，建议持续监控 30 天' },
+    ],
+    sources: ['工商接口', '历史付款记录'],
+    related: '应收明细 ¥42万',
+  },
+  'event-7': {
+    title: '主数据批量补全 · 5 家客户 13 项缺项',
+    conclusion: 'AI 已为 5 家客户生成 13 项主数据候选。财务一键确认 ≈ 2 分钟（vs 人工录入 4 小时）。',
+    confidence: 90,
+    confidenceReason: '批量操作，AI 匹配准确率 98%+',
+    chain: [
+      { label: '主数据扫描', detail: '5 家客户共缺 13 项：地址/银行/邮箱等' },
+      { label: '批量调用工商接口', detail: '返回 13 项匹配数据' },
+      { label: '与历史发票交叉验证', detail: '100% 匹配' },
+      { label: 'AI 建议', detail: '一键批量确认' },
+    ],
+    sources: ['工商接口', '历史发票档案'],
+    related: '5 家客户档案、13 张待开发票',
+  },
+  'event-safe': {
+    title: '其余 229 家经销商 · 风险评分 < 50',
+    conclusion: '低风险，无异常。AI 持续监控中，下次扫描 3 小时后。',
+    confidence: 95,
+    confidenceReason: '基于工商/税务/经营多源监控数据，评级 < 50 为低风险',
+    chain: [
+      { label: '多源数据扫描', detail: '工商 + 税务 + 经营 多维度扫描' },
+      { label: '风险评分', detail: '229 家评分 < 50，无异常特征' },
+      { label: 'AI 判定', detail: '低风险，常规监控' },
+    ],
+    sources: ['工商接口', '税务接口', '经营异常库'],
+    related: '229 家客户档案、风险评分明细',
+  },
+};
+
+// 模式切换
+document.querySelectorAll('.mode-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const mode = btn.dataset.mode;
+    document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    // 工作模式：显示工作区快捷入口 + 工作台子切换；智能体模式：显示智能体列表 + 工具区
+    document.querySelectorAll('[data-mode-content]').forEach(el => {
+      el.style.display = (el.dataset.modeContent === mode) ? '' : 'none';
+    });
+    document.querySelectorAll('[data-mode-section]').forEach(el => {
+      el.style.display = (el.dataset.modeSection === mode) ? '' : 'none';
+    });
+  });
+});
+
+// 工作台子切换：历史对话 / 定时任务
+document.querySelectorAll('.sub-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    const target = tab.dataset.subtab;
+    // tab 按钮 active 类切换
+    document.querySelectorAll('.sub-tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    // panel 显隐：用 inline style 强制覆盖（最高优先级）
+    document.querySelectorAll('.sub-tab-panel').forEach(p => {
+      if (p.dataset.subpanel === target) {
+        p.style.display = '';
+        p.classList.add('active');
+      } else {
+        p.style.display = 'none';
+        p.classList.remove('active');
+      }
+    });
+  });
+});
+
+// 智能体切换
+document.querySelectorAll('.agent-item').forEach(item => {
+  item.addEventListener('click', () => {
+    const target = item.dataset.agent;
+    document.querySelectorAll('.agent-item').forEach(i => i.classList.remove('active'));
+    document.querySelectorAll('.agent-panel').forEach(p => p.classList.remove('active'));
+    item.classList.add('active');
+    document.querySelector(`[data-panel="${target}"]`).classList.add('active');
+    document.getElementById('main-title').textContent = '金光 AI 财智能体驾驶舱';
+    switchView(target);
+  });
+});
+
+// 统一视图切换：所有有 data-view 的元素点击 → 切到对应右侧 view-panel
+function switchView(viewId) {
+  document.querySelectorAll('.view-panel, .agent-panel').forEach(p => p.classList && p.classList.remove('active'));
+  const target = document.querySelector(`[data-view-panel="${viewId}"]`);
+  if (target && target.classList) target.classList.add('active');
+  // 更新主标题
+  const titles = {
+    'agent-cockpit': '🪖 智能体驾驶舱',
+    'agent-billing': '智能开票专员 · 王二',
+    'agent-risk': '风险预警官 · 陈三',
+    'data-board': '数据看板',
+    'new-task': '＋ 新建任务',
+    'skill': '技能',
+    'history-1': '上海永胜包装 · 主数据确认',
+    'history-2': '浙江光华印务 · 风险处置',
+    'history-3': '苏州金鹏贸易 · 停止开票',
+    'history-4': '5 家主数据批量补全',
+    'history-5': '月初认证率盘点',
+    'schedule-1': '每日风险扫描',
+    'schedule-2': '周末应收提醒',
+    'schedule-3': '月度合规报告',
+    'schedule-4': '季度税务预警',
+    'tool-cap': '能力中心',
+    'tool-kb': '知识库',
+    'tool-mgr': '智能体管理',
+  };
+  document.getElementById('main-title').textContent = titles[viewId] || '金光 AI 财工作台';
+}
+
+        // 数据看板：数字滚动动画
+        function animateCounter(el) {
+          const target = parseFloat(el.dataset.counter);
+          const suffix = el.dataset.suffix || '';
+          const duration = 1500;
+          const start = performance.now();
+          const isFloat = target % 1 !== 0;
+          const step = (now) => {
+            const t = Math.min(1, (now - start) / duration);
+            const eased = 1 - Math.pow(1 - t, 3); // easeOutCubic
+            const current = target * eased;
+            el.textContent = (isFloat ? current.toFixed(1) : Math.round(current)) + (isFloat ? ' ' + suffix : suffix);
+            if (t < 1) requestAnimationFrame(step);
+          };
+          requestAnimationFrame(step);
+        }
+
+        // 重写 switchView：切到 data-board 时启动数字动画
+        const _origSwitchView = window.switchView;
+        window.switchView = function(viewId) {
+          if (_origSwitchView) _origSwitchView(viewId);
+          if (viewId === 'data-board') {
+            document.querySelectorAll('[data-counter]').forEach(animateCounter);
+          }
+        };
+
+
+// 绑定所有 data-view 元素的点击
+document.querySelectorAll('[data-view]').forEach(el => {
+  el.addEventListener('click', () => {
+    const viewId = el.dataset.view;
+    // 智能体模式下，激活左侧智能体项
+    if (el.classList && el.classList.contains('agent-item')) {
+      document.querySelectorAll('.agent-item').forEach(i => i.classList && i.classList.remove('active'));
+      el.classList.add('active');
+    }
+    switchView(viewId);
+  });
+});
+
+// Modal
+function openModal(id) {
+  const data = EVIDENCE[id];
+  if (!data) return;
+  document.getElementById('modal-title').textContent = data.title;
+  document.getElementById('modal-body').innerHTML = `
+    <div class="evidence-summary">
+      <div class="evidence-summary-title">💡 AI 结论摘要</div>
+      <div class="evidence-summary-text">${data.conclusion}</div>
+      <div class="evidence-confidence">
+        <span class="confidence-tag">置信度 ${data.confidence}%</span>
+        <div class="confidence-bar"><div class="confidence-bar-fill" style="width:${data.confidence}%;"></div></div>
+        <span style="color: var(--ink-3); font-size: 10px;">${data.confidenceReason}</span>
+      </div>
+    </div>
+    <div class="evidence-chain">
+      <div class="evidence-chain-title">🔍 判断依据链</div>
+      ${data.chain.map((s, i) => `
+        <div class="evidence-step">
+          <div class="evidence-step-num">${i+1}</div>
+          <div class="evidence-step-content">
+            <div class="label">${s.label}</div>
+            <div class="detail">${s.detail}</div>
+          </div>
+        </div>
+      `).join('')}
+    </div>
+    <div>
+      <div class="evidence-chain-title">📚 数据来源</div>
+      <div class="evidence-sources">
+        ${data.sources.map(s => `<span class="source-chip">${s}</span>`).join('')}
+      </div>
+    </div>
+    <div class="evidence-related"><b>关联上下文：</b>${data.related}</div>
+  `;
+  document.getElementById('modal-mask').classList.add('open');
+}
+function closeModal() {
+  document.getElementById('modal-mask').classList.remove('open');
+}
+document.querySelectorAll('.event-card').forEach(card => {
+  card.addEventListener('click', () => {
+    const id = card.dataset.event;
+    if (id && EVIDENCE[id]) openModal(id);
+  });
+});
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+</script>
+
+</body>
+</html<div class="view-panel" data-view-panel="tool-mgr">
+        <div style="padding: 24px; background: var(--canvas); min-height: calc(100vh - 60px);">
+
+          <!-- 区 1：顶部总览 -->
+          <div class="dash-kpi-strip" style="margin-bottom: 16px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+              <div>
+                <div style="font-size: 14px; font-weight: 600; color: var(--ink-1);">🤖 智能体团队配置</div>
+                <div style="font-size: 11px; color: var(--ink-3); margin-top: 2px;">3 个智能体在线运行 · 0 离线 · 0 异常</div>
+              </div>
+              <button class="btn-primary">＋ 创建新智能体</button>
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 0; padding-top: 12px; border-top: 1px solid var(--line);">
+              <div style="text-align: center;">
+                <div style="font-size: 28px; font-weight: 700; color: var(--ink-1);">3</div>
+                <div style="font-size: 11px; color: var(--ink-3); margin-top: 4px;">在线</div>
+                <div style="font-size: 10px; color: var(--success); margin-top: 2px;">全部启用</div>
+              </div>
+              <div style="background: var(--line);"></div>
+              <div style="text-align: center;">
+                <div style="font-size: 28px; font-weight: 700; color: var(--ink-1);">0</div>
+                <div style="font-size: 11px; color: var(--ink-3); margin-top: 4px;">离线</div>
+                <div style="font-size: 10px; color: var(--ink-3); margin-top: 2px;">运行正常</div>
+              </div>
+              <div style="background: var(--line);"></div>
+              <div style="text-align: center;">
+                <div style="font-size: 28px; font-weight: 700; color: var(--ink-1);">0</div>
+                <div style="font-size: 11px; color: var(--ink-3); margin-top: 4px;">异常</div>
+                <div style="font-size: 10px; color: var(--success); margin-top: 2px;">监控中</div>
+              </div>
+              <div style="background: var(--line);"></div>
+              <div style="text-align: center;">
+                <div style="font-size: 28px; font-weight: 700; color: var(--ink-1);">3</div>
+                <div style="font-size: 11px; color: var(--ink-3); margin-top: 4px;">智能体</div>
+                <div style="font-size: 10px; color: var(--ink-2); margin-top: 2px;">1 调度 + 2 业务</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 区 2：智能体清单 -->
+          <div style="margin-bottom: 16px;">
+            <div style="font-size: 13px; font-weight: 600; color: var(--ink-1); margin-bottom: 12px;">📋 智能体清单</div>
+
+            <!-- 智能体 1：智能体驾驶舱 -->
+            <div class="dash-card" style="border-left: 3px solid var(--brass); margin-bottom: 12px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+                <div style="display: flex; align-items: center; gap: 12px;">
+                  <div style="width: 36px; height: 36px; border-radius: 8px; background: var(--ink-1); color: var(--brass); display: flex; align-items: center; justify-content: center; font-size: 16px;">🪖</div>
+                  <div>
+                    <div style="font-size: 14px; font-weight: 600; color: var(--ink-1);">智能体驾驶舱</div>
+                    <div style="font-size: 11px; color: var(--ink-3); margin-top: 2px;">团队指挥官 · 跨智能体调度</div>
+                  </div>
+                </div>
+                <span style="font-size: 11px; color: var(--success); background: rgba(46, 158, 91, 0.1); padding: 3px 10px; border-radius: 10px;">🟢 在线运行</span>
+              </div>
+              <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 14px;">
+                <div style="padding: 10px 12px; background: var(--canvas); border-radius: var(--r); font-size: 11px;">
+                  <div style="color: var(--ink-3); margin-bottom: 4px;">调度引擎</div>
+                  <div style="display: flex; justify-content: space-between;"><span style="color: var(--ink-1); font-weight: 500;">🟢 启用</span><span style="color: var(--ink-3);">Grok 4.6</span></div>
+                </div>
+                <div style="padding: 10px 12px; background: var(--canvas); border-radius: var(--r); font-size: 11px;">
+                  <div style="color: var(--ink-3); margin-bottom: 4px;">任务编排</div>
+                  <div style="display: flex; justify-content: space-between;"><span style="color: var(--ink-1); font-weight: 500;">🟢 启用</span><span style="color: var(--ink-3);">0.3 秒/任务</span></div>
+                </div>
+                <div style="padding: 10px 12px; background: var(--canvas); border-radius: var(--r); font-size: 11px;">
+                  <div style="color: var(--ink-3); margin-bottom: 4px;">决策闸</div>
+                  <div style="display: flex; justify-content: space-between;"><span style="color: var(--ink-1); font-weight: 500;">🟢 启用</span><span style="color: var(--ink-3);">¥10,000</span></div>
+                </div>
+              </div>
+              <div style="font-size: 11px; color: var(--ink-3); margin-bottom: 6px;">关联智能体</div>
+              <div style="display: flex; gap: 6px; margin-bottom: 14px;">
+                <span style="font-size: 11px; padding: 3px 8px; background: var(--canvas); border-radius: 10px;">⚡ 智能开票专员</span>
+                <span style="font-size: 11px; padding: 3px 8px; background: var(--canvas); border-radius: 10px;">🛡 风险预警官</span>
+                <span style="font-size: 11px; padding: 3px 8px; background: var(--canvas); border-radius: 10px;">🔧 客户补全专员</span>
+              </div>
+              <div style="display: flex; gap: 8px;">
+                <button class="btn-ghost" style="height: 32px; padding: 0 14px;">编辑配置</button>
+                <button class="btn-cancel" style="height: 32px; padding: 0 14px;">暂停</button>
+                <button class="btn-ghost" style="height: 32px; padding: 0 14px;">查看执行历史</button>
+              </div>
+            </div>
+
+            <!-- 智能体 2：智能开票专员 -->
+            <div class="dash-card" style="border-left: 3px solid var(--success); margin-bottom: 12px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+                <div style="display: flex; align-items: center; gap: 12px;">
+                  <div style="width: 36px; height: 36px; border-radius: 8px; background: var(--ink-1); color: var(--brass); display: flex; align-items: center; justify-content: center; font-size: 16px;">⚡</div>
+                  <div>
+                    <div style="font-size: 14px; font-weight: 600; color: var(--ink-1);">智能开票专员</div>
+                    <div style="font-size: 11px; color: var(--ink-3); margin-top: 2px;">销项发票自动化 · 主数据补全</div>
+                  </div>
+                </div>
+                <span style="font-size: 11px; color: var(--success); background: rgba(46, 158, 91, 0.1); padding: 3px 10px; border-radius: 10px;">🟢 287/320 张</span>
+              </div>
+              <div style="font-size: 11px; color: var(--ink-3); margin-bottom: 6px;">能力配置</div>
+              <div style="display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px;">
+                <div style="display: flex; align-items: center; padding: 8px 12px; background: var(--canvas); border-radius: var(--r-sm); font-size: 12px;">
+                  <span style="color: var(--success); margin-right: 8px;">🟢</span>
+                  <span style="flex: 1;">票易通 MCP</span>
+                  <span style="color: var(--ink-3);">今日 387 次</span>
+                  <button class="btn-ghost" style="margin-left: 12px; height: 24px; padding: 0 10px; font-size: 11px;">配置</button>
+                </div>
+                <div style="display: flex; align-items: center; padding: 8px 12px; background: var(--canvas); border-radius: var(--r-sm); font-size: 12px;">
+                  <span style="color: var(--success); margin-right: 8px;">🟢</span>
+                  <span style="flex: 1;">乐企直连</span>
+                  <span style="color: var(--ink-3);">今日 92 次</span>
+                  <button class="btn-ghost" style="margin-left: 12px; height: 24px; padding: 0 10px; font-size: 11px;">配置</button>
+                </div>
+                <div style="display: flex; align-items: center; padding: 8px 12px; background: var(--canvas); border-radius: var(--r-sm); font-size: 12px;">
+                  <span style="color: var(--brass); margin-right: 8px;">🟡</span>
+                  <span style="flex: 1;">工商数据接口</span>
+                  <span style="color: var(--brass);">剩余 977/1000 次</span>
+                  <button class="btn-ghost" style="margin-left: 12px; height: 24px; padding: 0 10px; font-size: 11px;">配置</button>
+                </div>
+              </div>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px;">
+                <div style="padding: 10px 12px; background: var(--canvas); border-radius: var(--r); font-size: 11px;">
+                  <div style="color: var(--ink-3); margin-bottom: 4px;">知识库</div>
+                  <div style="color: var(--ink-1); font-size: 12px;">📚 发票模板库（128 条）<br>📚 客户主数据（234 家）</div>
+                </div>
+                <div style="padding: 10px 12px; background: var(--canvas); border-radius: var(--r); font-size: 11px;">
+                  <div style="color: var(--ink-3); margin-bottom: 4px;">执行权限</div>
+                  <div style="color: var(--ink-1); font-size: 12px;">✓ 开票（自动）<br>✓ 主数据（需确认）</div>
+                </div>
+              </div>
+              <div style="display: flex; gap: 8px;">
+                <button class="btn-ghost" style="height: 32px; padding: 0 14px;">编辑配置</button>
+                <button class="btn-cancel" style="height: 32px; padding: 0 14px;">暂停</button>
+                <button class="btn-ghost" style="height: 32px; padding: 0 14px;">查看任务</button>
+              </div>
+            </div>
+
+            <!-- 智能体 3：风险预警官 -->
+            <div class="dash-card" style="border-left: 3px solid var(--danger); margin-bottom: 12px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+                <div style="display: flex; align-items: center; gap: 12px;">
+                  <div style="width: 36px; height: 36px; border-radius: 8px; background: var(--ink-1); color: var(--brass); display: flex; align-items: center; justify-content: center; font-size: 16px;">🛡</div>
+                  <div>
+                    <div style="font-size: 14px; font-weight: 600; color: var(--ink-1);">风险预警官</div>
+                    <div style="font-size: 11px; color: var(--ink-3); margin-top: 2px;">客户风险扫描 + 异常预警</div>
+                  </div>
+                </div>
+                <span style="font-size: 11px; color: var(--success); background: rgba(46, 158, 91, 0.1); padding: 3px 10px; border-radius: 10px;">🟢 扫描中 · 67%</span>
+              </div>
+              <div style="font-size: 11px; color: var(--ink-3); margin-bottom: 6px;">能力配置</div>
+              <div style="display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px;">
+                <div style="display: flex; align-items: center; padding: 8px 12px; background: var(--canvas); border-radius: var(--r-sm); font-size: 12px;">
+                  <span style="color: var(--success); margin-right: 8px;">🟢</span>
+                  <span style="flex: 1;">风险评分模型</span>
+                  <span style="color: var(--ink-3);">v3.2.1 · 234/350 家</span>
+                  <button class="btn-ghost" style="margin-left: 12px; height: 24px; padding: 0 10px; font-size: 11px;">配置</button>
+                </div>
+                <div style="display: flex; align-items: center; padding: 8px 12px; background: var(--canvas); border-radius: var(--r-sm); font-size: 12px;">
+                  <span style="color: var(--success); margin-right: 8px;">🟢</span>
+                  <span style="flex: 1;">工商数据接口</span>
+                  <span style="color: var(--ink-3);">实时同步</span>
+                  <button class="btn-ghost" style="margin-left: 12px; height: 24px; padding: 0 10px; font-size: 11px;">配置</button>
+                </div>
+                <div style="display: flex; align-items: center; padding: 8px 12px; background: var(--canvas); border-radius: var(--r-sm); font-size: 12px;">
+                  <span style="color: var(--ink-3); margin-right: 8px;">⚪</span>
+                  <span style="flex: 1; color: var(--ink-3);">法务系统对接</span>
+                  <span style="color: var(--ink-3);">未启用</span>
+                  <button class="btn-primary" style="margin-left: 12px; height: 24px; padding: 0 10px; font-size: 11px;">开通</button>
+                </div>
+              </div>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px;">
+                <div style="padding: 10px 12px; background: var(--canvas); border-radius: var(--r); font-size: 11px;">
+                  <div style="color: var(--ink-3); margin-bottom: 4px;">知识库</div>
+                  <div style="color: var(--ink-1); font-size: 12px;">📚 风险案例库（56 条）<br>📚 法规库（1240 条）</div>
+                </div>
+                <div style="padding: 10px 12px; background: var(--canvas); border-radius: var(--r); font-size: 11px;">
+                  <div style="color: var(--ink-3); margin-bottom: 4px;">执行权限</div>
+                  <div style="color: var(--ink-1); font-size: 12px;">⚠ 仅预警（不处置）<br>📤 推送通知给财务</div>
+                </div>
+              </div>
+              <div style="display: flex; gap: 8px;">
+                <button class="btn-ghost" style="height: 32px; padding: 0 14px;">编辑配置</button>
+                <button class="btn-cancel" style="height: 32px; padding: 0 14px;">暂停</button>
+                <button class="btn-ghost" style="height: 32px; padding: 0 14px;">查看历史</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- 区 3：系统能力配置 -->
+          <div class="dash-card" style="margin-bottom: 24px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+              <div style="font-size: 14px; font-weight: 600; color: var(--ink-1);">🔧 系统能力配置</div>
+              <button class="btn-ghost">全部管理 →</button>
+            </div>
+
+            <!-- MCP 服务 -->
+            <div style="margin-bottom: 16px;">
+              <div style="font-size: 11px; color: var(--ink-3); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px;">MCP 服务 · 连接外部系统</div>
+              <div style="display: flex; flex-direction: column; gap: 6px;">
+                <div style="display: flex; align-items: center; padding: 8px 12px; background: var(--canvas); border-radius: var(--r-sm); font-size: 12px;">
+                  <span style="color: var(--success); margin-right: 8px;">🟢</span>
+                  <span style="flex: 1; color: var(--ink-1);">票易通</span>
+                  <span style="color: var(--ink-3); margin-right: 12px;">今日 387 次</span>
+                  <button class="btn-ghost" style="height: 24px; padding: 0 10px; font-size: 11px;">配置</button>
+                </div>
+                <div style="display: flex; align-items: center; padding: 8px 12px; background: var(--canvas); border-radius: var(--r-sm); font-size: 12px;">
+                  <span style="color: var(--success); margin-right: 8px;">🟢</span>
+                  <span style="flex: 1; color: var(--ink-1);">乐企直连</span>
+                  <span style="color: var(--ink-3); margin-right: 12px;">今日 92 次</span>
+                  <button class="btn-ghost" style="height: 24px; padding: 0 10px; font-size: 11px;">配置</button>
+                </div>
+                <div style="display: flex; align-items: center; padding: 8px 12px; background: var(--canvas); border-radius: var(--r-sm); font-size: 12px;">
+                  <span style="color: var(--brass); margin-right: 8px;">🟡</span>
+                  <span style="flex: 1; color: var(--ink-1);">工商数据接口</span>
+                  <span style="color: var(--brass); margin-right: 12px;">977/1000 次</span>
+                  <button class="btn-ghost" style="height: 24px; padding: 0 10px; font-size: 11px;">配置</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- 大模型 -->
+            <div style="margin-bottom: 16px;">
+              <div style="font-size: 11px; color: var(--ink-3); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px;">大模型</div>
+              <div style="display: flex; align-items: center; padding: 10px 12px; background: var(--canvas); border-radius: var(--r-sm); font-size: 12px;">
+                <span style="margin-right: 8px; font-size: 16px;">🤖</span>
+                <span style="flex: 1; color: var(--ink-1); font-weight: 500;">Grok 4.6</span>
+                <span style="color: var(--success); margin-right: 12px;">当前默认</span>
+                <button class="btn-ghost" style="height: 24px; padding: 0 10px; font-size: 11px;">更换</button>
+              </div>
+            </div>
+
+            <!-- 知识库 -->
+            <div>
+              <div style="font-size: 11px; color: var(--ink-3); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px;">知识库</div>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px;">
+                <div style="display: flex; align-items: center; padding: 8px 12px; background: var(--canvas); border-radius: var(--r-sm); font-size: 12px;">
+                  <span style="flex: 1;">📚 发票模板库</span>
+                  <span style="color: var(--ink-3); margin-right: 8px;">128 条</span>
+                  <button class="btn-ghost" style="height: 24px; padding: 0 10px; font-size: 11px;">管理</button>
+                </div>
+                <div style="display: flex; align-items: center; padding: 8px 12px; background: var(--canvas); border-radius: var(--r-sm); font-size: 12px;">
+                  <span style="flex: 1;">📚 客户主数据</span>
+                  <span style="color: var(--ink-3); margin-right: 8px;">234 家</span>
+                  <button class="btn-ghost" style="height: 24px; padding: 0 10px; font-size: 11px;">管理</button>
+                </div>
+                <div style="display: flex; align-items: center; padding: 8px 12px; background: var(--canvas); border-radius: var(--r-sm); font-size: 12px;">
+                  <span style="flex: 1;">📚 风险案例库</span>
+                  <span style="color: var(--ink-3); margin-right: 8px;">56 条</span>
+                  <button class="btn-ghost" style="height: 24px; padding: 0 10px; font-size: 11px;">管理</button>
+                </div>
+                <div style="display: flex; align-items: center; padding: 8px 12px; background: var(--canvas); border-radius: var(--r-sm); font-size: 12px;">
+                  <span style="flex: 1;">📚 法规库</span>
+                  <span style="color: var(--ink-3); margin-right: 8px;">1240 条</span>
+                  <button class="btn-ghost" style="height: 24px; padding: 0 10px; font-size: 11px;">管理</button>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+        </div>>

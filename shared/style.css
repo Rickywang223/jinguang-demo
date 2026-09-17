@@ -1,0 +1,125 @@
+/* ========== 中性口金卡 共享样式 ==========
+   适用于 Gallery 导航页 + 所有 Demo 子页
+   设计原则：
+   - 不用任何客户品牌色，避免替代某个客户说话
+   - 中性灰 + 商务蓝黑为主，accent 用一抹深金
+   - 卡片像硬壳卡包：边框清晰、布局规整、不花哨
+*/
+
+:root {
+  /* 主色系统 */
+  --ink-1: #1a1f2e;       /* 商务深墨，主文字 */
+  --ink-2: #4a5266;       /* 次级文字 */
+  --ink-3: #8a92a4;       /* 三级文字、辅助 */
+  --line: #e4e7ec;        /* 默认边框 */
+  --line-2: #f0f2f5;      /* 子背景 */
+  --paper: #ffffff;       /* 卡片底 */
+  --canvas: #fafbfc;      /* 页面底 */
+
+  /* accent */
+  --brass: #8c6a3a;       /* 烫金，深沉的金属色 */
+  --brass-2: #f5ecdc;     /* 烫金浅底 */
+
+  /* 状态色 */
+  --live: #2e6e4d;
+  --draft: #8a6d3b;
+  --archive: #6b7280;
+
+  /* 圆角 */
+  --r-sm: 4px;
+  --r: 8px;
+  --r-lg: 12px;
+
+  /* 阴影 */
+  --shadow-sm: 0 1px 2px rgba(26, 31, 46, 0.04);
+  --shadow: 0 2px 8px rgba(26, 31, 46, 0.06);
+  --shadow-hover: 0 4px 16px rgba(26, 31, 46, 0.10);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  font-family: -apple-system, "Segoe UI", "Microsoft YaHei", sans-serif;
+  color: var(--ink-1);
+  background: var(--canvas);
+  font-size: 14px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ========== Header ========== */
+header {
+  background: var(--paper);
+  border-bottom: 1px solid var(--line);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+.header-inner {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 18px 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.brand { display: flex; align-items: center; gap: 14px; }
+.brand-logo {
+  width: 36px; height: 36px;
+  background: var(--ink-1);
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--brass-2); font-weight: 700; font-size: 16px;
+}
+.brand-text { display: flex; flex-direction: column; line-height: 1.2; }
+.brand-title { font-size: 15px; font-weight: 600; color: var(--ink-1); }
+.brand-sub { font-size: 12px; color: var(--ink-3); margin-top: 2px; }
+.header-meta { display: flex; gap: 18px; font-size: 12px; color: var(--ink-3); }
+.header-meta .pill {
+  padding: 4px 10px; border: 1px solid var(--line);
+  border-radius: 20px; background: var(--paper);
+}
+
+/* ========== Footer ========== */
+footer {
+  border-top: 1px solid var(--line);
+  background: var(--paper);
+  padding: 24px 32px;
+  text-align: center;
+  font-size: 12px;
+  color: var(--ink-3);
+}
+
+/* ========== 通用按钮 ========== */
+.btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  height: 38px; padding: 0 18px;
+  border-radius: var(--r);
+  font-size: 13px; font-weight: 500;
+  border: 1px solid var(--ink-1);
+  background: var(--ink-1); color: var(--paper);
+  cursor: pointer; transition: all 0.15s;
+}
+.btn:hover { background: #000; }
+.btn-ghost {
+  background: var(--paper); color: var(--ink-1);
+}
+.btn-ghost:hover { background: var(--line-2); }
+
+/* ========== 状态徽章 ========== */
+.status {
+  font-size: 10px; padding: 2px 8px;
+  border-radius: 10px;
+  letter-spacing: 0.3px;
+  font-weight: 600;
+}
+.status-live { background: #eaf3ee; color: var(--live); }
+.status-draft { background: #faf2e3; color: var(--draft); }
+.status-archive { background: #f0f2f5; color: var(--archive); }
+
+/* ========== 布局容器 ========== */
+.container {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 32px;
+}
