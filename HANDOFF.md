@@ -308,18 +308,75 @@ function openModal(id) {
 
 ---
 
+## 🆕 七·五、R001 实现说明：智能体左右分栏布局（2026-09-18）
+
+> 需求文档：`.changes/R001-agent-split-layout.md`
+
+### 改了什么
+
+`agent-billing`（智能开票专员）和 `agent-risk`（风险预警官）从**单列堆叠**改为**左右分栏**：
+
+```
+┌────────────────────────┬────────────────────────┐
+│ 左区：聊天窗口 (50%)    │ 右区：页签看板 (50%)    │
+│  · .chat-header        │  · .dashboard-tabs     │
+│  · .chat-messages      │    📊 BI 报表（默认）   │
+│  · .chat-input-bar     │    📚 资料库           │
+│                        │    🌐 网页（iframe）    │
+└────────────────────────┴────────────────────────┘
+              中间：.agent-split-resizer 分隔线
+```
+
+原「状态卡 + 4 KPI + 事件流 + AI 建议」整体移入右区 **BI 报表** tab，未做内容改动。
+
+### 新增 CSS class
+
+| class | 作用 |
+|:--|:--|
+| `.agent-split-layout` | 分栏容器，`height: calc(100vh - 60px)`，`display: flex` |
+| `.agent-split-left` / `.agent-split-right` | 左右两栏，各 `flex: 1`（即 50:50） |
+| `.agent-split-resizer` | 中间分隔线（4px） |
+| `.chat-header` / `.chat-messages` / `.chat-input-bar` / `.chat-input-row` | 聊天区 |
+| `.chat-msg` / `.chat-msg-ai` / `.chat-msg-user` | 聊天气泡 |
+| `.dashboard-tabs` / `.tab-active` | 右区页签栏与选中态 |
+| `.dashboard-content` / `.dashboard-pane` / `.tab-pane-active` | 页签内容与显隐 |
+| `.doc-list` / `.doc-item` | 「资料库」tab 列表 |
+| `.web-frame` / `.web-frame-bar` | 「网页」tab 的 iframe |
+
+### 新增 JS
+
+| 名称 | 作用 |
+|:--|:--|
+| `AGENT_CHAT` | 每个智能体**独立**的聊天历史（内存，切换不丢） |
+| `CHAT_REPLIES` | 模拟回复池 |
+| `MOCK_WEB` | 「网页」tab 的示例页面（内嵌 HTML 字符串，**无外部依赖**） |
+| `renderChat(agentId)` | 渲染某智能体的聊天记录 |
+| `sendChatMessage(agentId, text)` | 发送消息 → 500ms 后追加模拟回复 |
+| `switchDashTab(agentId, tab)` | 右区页签切换（「网页」tab 首次激活才注入 iframe，按需渲染） |
+
+绑定方式：`[data-chat-send]` / `[data-chat-input]` / `[data-tabs]` / `[data-web-frame]` 属性选择器，支持文本框 Enter 发送（Shift+Enter 换行）。
+
+### ⚠️ 实现注意（后续改动不要破坏）
+
+1. `.chat-messages` 和 `.dashboard-content` 必须保留 `min-height: 0`，否则在 flex 容器内**无法正确滚动**
+2. 滚动由**内层**（`.chat-messages` / `.dashboard-content`）承担，**没有**给分栏外层加 `overflow: hidden`
+3. 右区切 tab 只切换 `.dashboard-pane` 的 `tab-pane-active`，**左区聊天完全不受影响**
+4. 聊天历史按 `agentId` 分开存储；新增智能体只需在 `AGENT_CHAT` / `CHAT_REPLIES` / `MOCK_WEB` 里加一份
+
+---
+
 ## ⚠️ 八、已知问题（建议优先解决）
 
 ### 高优先级
 
-1. **JS 报错**：`Cannot read properties of null (reading 'classList')`
-   - 原因：旧 `.agent-panel` 元素没正确清理
-   - 修复：所有 panel 已切换到 `view-panel` class，但 switchView 还兼容 `.agent-panel`，逻辑混乱
-   - 建议：彻底移除 `.agent-panel` 引用
+1. ~~**JS 报错**：`Cannot read properties of null (reading 'classList')`~~ ✅ **已修复 2026-09-18**
+   - 根因：页面不存在 `[data-panel]` 元素，`querySelector` 返回 null 后直接取 `.classList`
+   - 已加判空；另修复了 `history-1` 闭合错位、`tool-mgr` 游离在 `<main>` 外两处结构问题
+   - 遗留：`.agent-item` 处理器与 `[data-view]` 处理器功能重复，可择机删除（非必要）
 
-2. **聊天无交互**
-   - 现象：textarea + 发送按钮无响应
-   - 建议：接入 mock 流式回复（用户输入 → 500ms 后 AI 回复气泡）
+2. ~~**聊天无交互**~~ ✅ **已修复 2026-09-18（R001）**
+   - `agent-billing` / `agent-risk` 两个智能体的聊天区已可发送并收到模拟回复
+   - 注意：**其它 panel** 底部的聊天框（`new-task` / `history-*`）仍是装饰性 textarea，未接入
 
 3. **数据全写死**
    - 现象：287 张开票、5 家高风险等数字都是硬编码

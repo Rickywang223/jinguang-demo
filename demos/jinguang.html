@@ -648,6 +648,151 @@
   cursor: pointer; font-size: 12px;
 }
 .btn-cancel:hover { border-color: var(--ink-1); color: var(--ink-1); }
+
+/* ============ R001：智能体左右分栏布局（聊天 + 看板） ============ */
+.agent-split-layout {
+  display: flex;
+  height: calc(100vh - 60px);
+  background: var(--canvas);
+}
+.agent-split-left, .agent-split-right {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+.agent-split-resizer {
+  width: 4px;
+  flex-shrink: 0;
+  background: var(--line);
+  cursor: col-resize;
+}
+.agent-split-resizer:hover { background: var(--brass); }
+
+/* 左区：聊天窗口 */
+.chat-header {
+  flex-shrink: 0;
+  background: var(--paper);
+  border-bottom: 1px solid var(--line);
+  padding: 14px 20px;
+  display: flex; justify-content: space-between; align-items: center;
+}
+.chat-header-title { font-size: 14px; font-weight: 600; color: var(--ink-1); }
+.chat-header-sub { font-size: 11px; color: var(--ink-3); margin-top: 2px; }
+.chat-messages {
+  flex: 1;
+  min-height: 0;              /* 关键：让内部滚动区在 flex 下正确收缩 */
+  overflow-y: auto;
+  padding: 20px;
+  background: var(--canvas);
+}
+.chat-msg {
+  max-width: 82%;
+  margin-bottom: 12px;
+  padding: 10px 14px;
+  border-radius: var(--r);
+  font-size: 13px;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.chat-msg-ai {
+  background: var(--paper);
+  border: 1px solid var(--line-2);
+  color: var(--ink-1);
+  margin-right: auto;
+}
+.chat-msg-user {
+  background: var(--ink-1);
+  color: var(--paper);
+  margin-left: auto;
+}
+.chat-input-bar {
+  flex-shrink: 0;
+  background: var(--paper);
+  border-top: 1px solid var(--line);
+  padding: 12px 20px 16px;
+}
+.chat-input-row {
+  display: flex; gap: 8px; align-items: flex-end;
+  background: var(--canvas);
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  padding: 8px 12px;
+}
+.chat-input-row textarea {
+  flex: 1; background: transparent; border: none; outline: none;
+  resize: none; font-size: 13px; font-family: inherit; line-height: 1.5;
+  max-height: 120px;
+}
+
+/* 右区：页签看板 */
+.dashboard-tabs {
+  flex-shrink: 0;
+  display: flex;
+  background: var(--paper);
+  border-bottom: 1px solid var(--line);
+  padding: 0 12px;
+}
+.dashboard-tabs button {
+  padding: 12px 16px;
+  border: none;
+  background: transparent;
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  font-size: 13px;
+  font-family: inherit;
+  color: var(--ink-2);
+}
+.dashboard-tabs button:hover { color: var(--ink-1); }
+.dashboard-tabs button.tab-active {
+  border-bottom-color: var(--brass);
+  color: var(--brass);
+  font-weight: 600;
+}
+.dashboard-content {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 20px;
+  background: var(--canvas);
+}
+.dashboard-pane { display: none; }
+.dashboard-pane.tab-pane-active { display: block; }
+
+/* 资料库列表 */
+.doc-list { display: flex; flex-direction: column; gap: 8px; }
+.doc-item {
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px 14px;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  cursor: pointer;
+  font-size: 13px;
+  color: var(--ink-1);
+}
+.doc-item:hover { border-color: var(--brass); }
+.doc-item-meta { margin-left: auto; font-size: 11px; color: var(--ink-3); }
+
+/* 网页内嵌 */
+.web-frame-bar {
+  display: flex; justify-content: space-between; align-items: center;
+  font-size: 11px; color: var(--ink-3); margin-bottom: 10px;
+}
+.web-frame {
+  width: 100%; height: calc(100vh - 220px); min-height: 360px;
+  border: 1px solid var(--line); border-radius: var(--r);
+  background: var(--paper); display: block;
+}
+
+/* 窄屏：纵向堆叠 */
+@media (max-width: 768px) {
+  .agent-split-layout { flex-direction: column; height: auto; }
+  .agent-split-resizer { display: none; }
+  .agent-split-left { border-bottom: 1px solid var(--line); }
+  .chat-messages { max-height: 45vh; }
+}
 </style>
 </head>
 <body>
@@ -1028,15 +1173,34 @@
         </div>
       </div>      <!-- ===== 视图：智能开票专员驾驶舱（含聊天区） ===== -->
       <div class="view-panel" data-view-panel="agent-billing">
-        <div style="display: flex; flex-direction: column; height: calc(100vh - 60px);">
-          <div style="background: var(--paper); border-bottom: 1px solid var(--line); padding: 14px 24px; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0;">
-            <div>
-              <div style="font-size: 14px; font-weight: 600; color: var(--ink-1);">⚡ 智能开票专员 · 王二</div>
-              <div style="font-size: 11px; color: var(--ink-3); margin-top: 2px;">🟢 在线运行 · 287/320 张 · 4.2 小时</div>
+        <div class="agent-split-layout">
+          <!-- 左区：聊天窗口 -->
+          <div class="agent-split-left">
+            <div class="chat-header">
+              <div>
+                <div class="chat-header-title">⚡ 智能开票专员 · 王二</div>
+                <div class="chat-header-sub">🟢 在线运行 · 287/320 张 · 4.2 小时</div>
+              </div>
+              <button class="btn-ghost">[查看执行结果]</button>
             </div>
-            <button class="btn-ghost">[查看执行结果]</button>
+            <div class="chat-messages" data-chat-messages="agent-billing"></div>
+            <div class="chat-input-bar">
+              <div class="chat-input-row">
+                <textarea rows="1" data-chat-input="agent-billing" placeholder="给智能体发消息，例如：帮苏州金鹏手动开 1 张 ¥5000 的发票"></textarea>
+                <button class="btn-primary" data-chat-send="agent-billing">↑ 发送</button>
+              </div>
+            </div>
           </div>
-          <div style="flex: 1; overflow-y: auto; padding: 24px; background: var(--canvas);">
+          <div class="agent-split-resizer"></div>
+          <!-- 右区：页签看板 -->
+          <div class="agent-split-right">
+            <div class="dashboard-tabs" data-tabs="agent-billing">
+              <button class="tab-active" data-tab="bi">📊 BI 报表</button>
+              <button data-tab="docs">📚 资料库</button>
+              <button data-tab="web">🌐 网页</button>
+            </div>
+            <div class="dashboard-content">
+              <div class="dashboard-pane tab-pane-active" data-pane="bi">
             <div style="background: linear-gradient(135deg, #1a1f2e 0%, #2a3142 100%); border-radius: var(--r-lg); padding: 20px 24px; color: var(--paper); margin-bottom: 16px;">
               <div style="display: flex; align-items: center; gap: 14px; margin-bottom: 14px;">
                 <div style="width: 48px; height: 48px; border-radius: 24px; background: var(--brass); color: var(--ink-1); display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 12px; font-weight: 700;">AI<div style="font-size: 8px;">开票</div></div>
@@ -1070,13 +1234,21 @@
                 <div style="display: flex; gap: 8px; margin-top: 6px;"><button class="btn-primary" style="height: 26px; padding: 0 10px; font-size: 11px;">✓ 同意</button><button class="btn-cancel" style="height: 26px; padding: 0 10px; font-size: 11px;">✗ 拒绝</button></div>
               </div>
             </div>
-          </div>
-          <div style="background: var(--paper); border-top: 1px solid var(--line); padding: 12px 24px 16px; flex-shrink: 0;">
-            <div style="max-width: 900px; margin: 0 auto;">
-              <div style="font-size: 11px; color: var(--ink-3); margin-bottom: 6px;">💬 与智能开票专员对话</div>
-              <div style="display: flex; gap: 8px; align-items: flex-end; background: var(--canvas); border: 1px solid var(--line); border-radius: var(--r); padding: 8px 12px;">
-                <textarea placeholder="给智能体发消息，例如：帮苏州金鹏手动开 1 张 ¥5000 的发票" rows="1" style="flex: 1; background: transparent; border: none; outline: none; resize: none; font-size: 13px; font-family: inherit; line-height: 1.5;"></textarea>
-                <button class="btn-primary" style="height: 32px; padding: 0 14px;">↑ 发送</button>
+              </div>
+              <div class="dashboard-pane" data-pane="docs">
+                <div class="doc-list">
+                  <div class="doc-item"><span>📄</span><span>发票模板库</span><span class="doc-item-meta">12 个模板</span></div>
+                  <div class="doc-item"><span>👥</span><span>客户主数据</span><span class="doc-item-meta">234 家</span></div>
+                  <div class="doc-item"><span>⚠️</span><span>风险案例库</span><span class="doc-item-meta">46 条</span></div>
+                  <div class="doc-item"><span>📜</span><span>税务法规库</span><span class="doc-item-meta">最近更新 09-15</span></div>
+                </div>
+              </div>
+              <div class="dashboard-pane" data-pane="web">
+                <div class="web-frame-bar">
+                  <span>票易通开票后台（示例）</span>
+                  <span>在新窗口打开 ↗</span>
+                </div>
+                <iframe class="web-frame" data-web-frame="agent-billing" title="票易通开票后台（示例）"></iframe>
               </div>
             </div>
           </div>
@@ -1085,15 +1257,34 @@
 
       <!-- ===== 视图：风险预警官驾驶舱（含聊天区） ===== -->
       <div class="view-panel" data-view-panel="agent-risk">
-        <div style="display: flex; flex-direction: column; height: calc(100vh - 60px);">
-          <div style="background: var(--paper); border-bottom: 1px solid var(--line); padding: 14px 24px; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0;">
-            <div>
-              <div style="font-size: 14px; font-weight: 600; color: var(--ink-1);">🛡 风险预警官 · 陈三</div>
-              <div style="font-size: 11px; color: var(--ink-3); margin-top: 2px;">🟢 扫描中 · 进度 67% · 234 / 350 家</div>
+        <div class="agent-split-layout">
+          <!-- 左区：聊天窗口 -->
+          <div class="agent-split-left">
+            <div class="chat-header">
+              <div>
+                <div class="chat-header-title">🛡 风险预警官 · 陈三</div>
+                <div class="chat-header-sub">🟢 扫描中 · 进度 67% · 234 / 350 家</div>
+              </div>
+              <button class="btn-ghost">[查看扫描结果]</button>
             </div>
-            <button class="btn-ghost">[查看扫描结果]</button>
+            <div class="chat-messages" data-chat-messages="agent-risk"></div>
+            <div class="chat-input-bar">
+              <div class="chat-input-row">
+                <textarea rows="1" data-chat-input="agent-risk" placeholder="给智能体发消息，例如：扫描结果生成一份风险周报"></textarea>
+                <button class="btn-primary" data-chat-send="agent-risk">↑ 发送</button>
+              </div>
+            </div>
           </div>
-          <div style="flex: 1; overflow-y: auto; padding: 24px; background: var(--canvas);">
+          <div class="agent-split-resizer"></div>
+          <!-- 右区：页签看板 -->
+          <div class="agent-split-right">
+            <div class="dashboard-tabs" data-tabs="agent-risk">
+              <button class="tab-active" data-tab="bi">📊 BI 报表</button>
+              <button data-tab="docs">📚 资料库</button>
+              <button data-tab="web">🌐 网页</button>
+            </div>
+            <div class="dashboard-content">
+              <div class="dashboard-pane tab-pane-active" data-pane="bi">
             <div style="background: linear-gradient(135deg, #1a1f2e 0%, #2a3142 100%); border-radius: var(--r-lg); padding: 20px 24px; color: var(--paper); margin-bottom: 16px;">
               <div style="display: flex; align-items: center; gap: 14px; margin-bottom: 14px;">
                 <div style="width: 48px; height: 48px; border-radius: 24px; background: var(--danger); color: var(--paper); display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 12px; font-weight: 700;">AI<div style="font-size: 8px;">风险</div></div>
@@ -1127,13 +1318,21 @@
                 <div style="display: flex; gap: 8px; margin-top: 6px;"><button class="btn-primary" style="height: 26px; padding: 0 10px; font-size: 11px;">✓ 同意</button><button class="btn-cancel" style="height: 26px; padding: 0 10px; font-size: 11px;">✗ 拒绝</button></div>
               </div>
             </div>
-          </div>
-          <div style="background: var(--paper); border-top: 1px solid var(--line); padding: 12px 24px 16px; flex-shrink: 0;">
-            <div style="max-width: 900px; margin: 0 auto;">
-              <div style="font-size: 11px; color: var(--ink-3); margin-bottom: 6px;">💬 与风险预警官对话</div>
-              <div style="display: flex; gap: 8px; align-items: flex-end; background: var(--canvas); border: 1px solid var(--line); border-radius: var(--r); padding: 8px 12px;">
-                <textarea placeholder="给智能体发消息，例如：扫描结果生成一份风险周报" rows="1" style="flex: 1; background: transparent; border: none; outline: none; resize: none; font-size: 13px; font-family: inherit; line-height: 1.5;"></textarea>
-                <button class="btn-primary" style="height: 32px; padding: 0 14px;">↑ 发送</button>
+              </div>
+              <div class="dashboard-pane" data-pane="docs">
+                <div class="doc-list">
+                  <div class="doc-item"><span>📊</span><span>风险规则库</span><span class="doc-item-meta">38 条规则</span></div>
+                  <div class="doc-item"><span>🏢</span><span>客户工商档案</span><span class="doc-item-meta">234 家</span></div>
+                  <div class="doc-item"><span>📈</span><span>历史预警记录</span><span class="doc-item-meta">512 条</span></div>
+                  <div class="doc-item"><span>📜</span><span>监管政策库</span><span class="doc-item-meta">最近更新 09-12</span></div>
+                </div>
+              </div>
+              <div class="dashboard-pane" data-pane="web">
+                <div class="web-frame-bar">
+                  <span>风险监控平台（示例）</span>
+                  <span>在新窗口打开 ↗</span>
+                </div>
+                <iframe class="web-frame" data-web-frame="agent-risk" title="风险监控平台（示例）"></iframe>
               </div>
             </div>
           </div>
@@ -2318,6 +2517,143 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal()
 
 // ===== 首屏初始化：激活默认视图，避免打开即白屏 =====
 if (!currentView()) switchView(MODE_DEFAULT_VIEW.work);
+
+// ============ R001：智能体分栏 —— 聊天 + 页签看板 ============
+
+// 每个智能体的聊天历史（内存保存，切换智能体互不影响）
+const AGENT_CHAT = {
+  'agent-billing': [
+    { role: 'ai',   text: '您好，我是智能开票专员王二 👋\n今日已自动开票 287 张，其中 3 张触发风险规则，待您确认。' },
+    { role: 'user', text: '苏州金鹏那笔 ¥96,000 是什么情况？' },
+    { role: 'ai',   text: '苏州金鹏已被列为税务非正常户，该笔发票命中「客户风险」规则，已自动拦截。\n建议停止开票并归档，需要我现在处理吗？' }
+  ],
+  'agent-risk': [
+    { role: 'ai',   text: '您好，我是风险预警官陈三 🛡\n正在扫描 350 家客户，已完成 234 家，发现 5 家高风险。' },
+    { role: 'user', text: '高风险客户都有谁？' },
+    { role: 'ai',   text: '当前 5 家高风险：苏州金鹏（税务非正常户）、浙江光华（法人变更）等，合计敞口约 ¥87 万。\n详见右侧「BI 报表」事件流。' }
+  ]
+};
+
+// 模拟回复池
+const CHAT_REPLIES = {
+  'agent-billing': [
+    '好的，我这就去票易通查询，请稍候…',
+    '已拉取到相关发票记录，正在核对客户主数据。',
+    '处理完成，最新进度可在右侧「BI 报表」查看。'
+  ],
+  'agent-risk': [
+    '正在扫描最新工商/税务数据，请稍候…',
+    '已比对风险规则库，命中 2 条中风险规则。',
+    '风险报告已生成，明细可在右侧「资料库」查看。'
+  ]
+};
+
+// 「网页」tab 的示例页面（内嵌 mock，不依赖外部服务）
+const MOCK_WEB = {
+  'agent-billing': '<!doctype html><html><head><meta charset="utf-8"><style>'
+    + 'body{font-family:-apple-system,"PingFang SC",sans-serif;margin:0;padding:16px;background:#f7f8fa;color:#1a1f2e;font-size:13px}'
+    + 'h3{margin:0 0 4px;font-size:14px}.sub{color:#8c92a3;font-size:11px;margin-bottom:12px}'
+    + 'table{width:100%;border-collapse:collapse;background:#fff;border:1px solid #f0f0f0;border-radius:8px;overflow:hidden}'
+    + 'th,td{text-align:left;padding:8px 10px;border-bottom:1px solid #f0f0f0;font-size:12px}'
+    + 'th{background:#fafafa;color:#4a5266;font-weight:600}.ok{color:#2e9e5b}.bad{color:#b9342c}'
+    + '</style></head><body><h3>票易通 · 开票后台</h3>'
+    + '<div class="sub">示例页面（内嵌演示，非真实服务）</div>'
+    + '<table><tr><th>时间</th><th>客户</th><th>金额</th><th>状态</th></tr>'
+    + '<tr><td>14:32</td><td>上海永胜包装</td><td>¥124,500</td><td class="ok">已开票</td></tr>'
+    + '<tr><td>11:45</td><td>苏州金鹏贸易</td><td>¥96,000</td><td class="bad">已拦截</td></tr>'
+    + '<tr><td>10:20</td><td>浙江光华印务</td><td>¥58,300</td><td class="ok">已开票</td></tr>'
+    + '</table></body></html>',
+  'agent-risk': '<!doctype html><html><head><meta charset="utf-8"><style>'
+    + 'body{font-family:-apple-system,"PingFang SC",sans-serif;margin:0;padding:16px;background:#f7f8fa;color:#1a1f2e;font-size:13px}'
+    + 'h3{margin:0 0 4px;font-size:14px}.sub{color:#8c92a3;font-size:11px;margin-bottom:12px}'
+    + '.row{display:flex;align-items:center;gap:10px;background:#fff;border:1px solid #f0f0f0;'
+    + 'border-left:3px solid #b9342c;border-radius:8px;padding:10px 12px;margin-bottom:8px;font-size:12px}'
+    + '.lv{margin-left:auto;color:#b9342c;font-weight:600}'
+    + '</style></head><body><h3>风险监控平台</h3>'
+    + '<div class="sub">示例页面（内嵌演示，非真实服务）</div>'
+    + '<div class="row"><span>🚨</span><span>苏州金鹏贸易 · 税务非正常户</span><span class="lv">高</span></div>'
+    + '<div class="row"><span>⚠</span><span>浙江光华印务 · 法人变更</span><span class="lv">中</span></div>'
+    + '<div class="row"><span>⚠</span><span>江苏鸿运物流 · 经营异常</span><span class="lv">中</span></div>'
+    + '</body></html>'
+};
+
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, c =>
+    ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
+
+function renderChat(agentId) {
+  const box = document.querySelector('[data-chat-messages="' + agentId + '"]');
+  if (!box) return;
+  const list = AGENT_CHAT[agentId] || [];
+  box.innerHTML = list.map(m =>
+    '<div class="chat-msg chat-msg-' + (m.role === 'user' ? 'user' : 'ai') + '">'
+    + escapeHtml(m.text) + '</div>').join('');
+  box.scrollTop = box.scrollHeight;
+}
+
+function sendChatMessage(agentId, text) {
+  const t = String(text || '').trim();
+  if (!t) return;
+  if (!AGENT_CHAT[agentId]) AGENT_CHAT[agentId] = [];
+  AGENT_CHAT[agentId].push({ role: 'user', text: t });
+  renderChat(agentId);
+
+  const pool = CHAT_REPLIES[agentId] || ['收到。'];
+  const n = AGENT_CHAT[agentId].filter(m => m.role === 'user').length - 1;
+  const reply = pool[Math.min(n, pool.length - 1)];
+  setTimeout(() => {
+    AGENT_CHAT[agentId].push({ role: 'ai', text: reply });
+    renderChat(agentId);
+  }, 500);
+}
+
+// 绑定聊天发送（点击 + Enter）
+document.querySelectorAll('[data-chat-send]').forEach(btn => {
+  const agentId = btn.dataset.chatSend;
+  const input = document.querySelector('[data-chat-input="' + agentId + '"]');
+  const submit = () => {
+    if (!input) return;
+    sendChatMessage(agentId, input.value);
+    input.value = '';
+  };
+  btn.addEventListener('click', submit);
+  if (input) input.addEventListener('keydown', e => {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); submit(); }
+  });
+});
+
+// 右区页签切换
+function switchDashTab(agentId, tab) {
+  const bar = document.querySelector('[data-tabs="' + agentId + '"]');
+  if (!bar) return;
+  const layout = bar.closest('.agent-split-layout');
+  if (!layout) return;
+  bar.querySelectorAll('button').forEach(b =>
+    b.classList.toggle('tab-active', b.dataset.tab === tab));
+  layout.querySelectorAll('.dashboard-pane').forEach(pane =>
+    pane.classList.toggle('tab-pane-active', pane.dataset.pane === tab));
+
+  // 「网页」tab 首次激活时才注入 iframe 内容（按需渲染）
+  if (tab === 'web') {
+    const frame = layout.querySelector('[data-web-frame="' + agentId + '"]');
+    if (frame && !frame.dataset.loaded) {
+      frame.srcdoc = MOCK_WEB[agentId] || '';
+      frame.dataset.loaded = '1';
+    }
+  }
+}
+
+document.querySelectorAll('.dashboard-tabs').forEach(bar => {
+  const agentId = bar.dataset.tabs;
+  bar.querySelectorAll('button').forEach(b => {
+    b.addEventListener('click', () => switchDashTab(agentId, b.dataset.tab));
+  });
+});
+
+// 初始化聊天历史
+Object.keys(AGENT_CHAT).forEach(renderChat);
+
 </script>
 
 </body></html>
