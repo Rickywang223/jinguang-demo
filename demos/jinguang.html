@@ -253,7 +253,11 @@
   border-top: 1px solid var(--line-2);
   display: flex; align-items: center; gap: 10px;
   background: var(--canvas);
+  margin-top: auto;   /* 用户区始终贴底 */
 }
+/* 智能体模式：由工具区吸收剩余空间并贴到用户区上方，用户区不再抢占空间 */
+.demo-sidebar[data-mode="agent"] .sidebar-tool-list { margin-top: auto; }
+.demo-sidebar[data-mode="agent"] .sidebar-user { margin-top: 0; }
 .sidebar-user-avatar {
   width: 28px; height: 28px;
   border-radius: 14px;
@@ -653,7 +657,7 @@
 <div class="demo-layout">
 
   <!-- ===== 左侧栏 ===== -->
-  <aside class="demo-sidebar">
+  <aside class="demo-sidebar" data-mode="work">
     <div class="sidebar-brand">
       <div class="sidebar-brand-icon">AI</div>
       <div class="sidebar-brand-text">
@@ -1582,6 +1586,7 @@
             </div>
           </div>
         </div>
+      </div>
       <!-- ===== 视图：历史对话 2（浙江光华·风险处置） ===== -->
       <div class="view-panel" data-view-panel="history-2">
         <div style="display: flex; flex-direction: column; height: calc(100vh - 60px);">
@@ -1712,7 +1717,6 @@
           </div>
         </div>
       </div>
-      </div>
 
       <!-- ===== 视图：定时任务 1 ===== -->
       <div class="view-panel" data-view-panel="schedule-1">
@@ -1747,298 +1751,6 @@
         </div>
       </div>
       
-
-      </div><!-- /.views-container -->
-    </div>
-  </main>
-
-</div>
-
-</div>
-
-<!-- AI 依据 Modal -->
-<div class="modal-mask" id="modal-mask" onclick="if(event.target===this) closeModal()">
-  <div class="modal">
-    <div class="modal-header">
-      <div>
-        <div class="modal-title" id="modal-title">AI 依据详情</div>
-        <div class="modal-sub" id="modal-sub">基于 AI 智能体判断</div>
-      </div>
-      <button class="modal-close" onclick="closeModal()">✕</button>
-    </div>
-    <div class="modal-body" id="modal-body"></div>
-    <div class="modal-footer">
-      <button class="btn-cancel" onclick="closeModal()">关闭</button>
-    </div>
-  </div>
-</div>
-
-<script>
-const EVIDENCE = {
-  'event-1': {
-    title: '苏州金鹏贸易 · 税务非正常户 · 风险 92',
-    conclusion: '该客户已被税务机关认定为"税务非正常户"，继续开票将面临进项转出风险 ¥96万。AI 建议立即停止合作。',
-    confidence: 92,
-    confidenceReason: '多源数据交叉验证：工商异常 + 税务非正常 + 5天内风险陡增',
-    chain: [
-      { label: '工商数据扫描', detail: '2026-09-12 检测到"列入经营异常名录"' },
-      { label: '税务数据扫描', detail: '2026-09-11 被认定为"税务非正常户"' },
-      { label: '风险特征匹配', detail: '匹配历史坏账案例 3 项，相似度 87%' },
-      { label: 'AI 综合判定', detail: '高风险，建议立即停止开票' },
-    ],
-    sources: ['工商接口', '税务接口', '历史坏账案例库', '风险特征模型'],
-    related: '关联客户档案、关联发票 96万、关联历史坏账案例 3 个',
-  },
-  'event-2': {
-    title: '浙江光华印务 · 法人变更 + 13 张待开 · 风险 88',
-    conclusion: '客户法人变更后，商业存在异常。结合 13 张待开 ¥178万 应收，AI 建议立即开票+调整账期。',
-    confidence: 88,
-    confidenceReason: '法人变更信号 + 应收规模大 + 距月底申报窗口期紧',
-    chain: [
-      { label: '法人变更检测', detail: '2026-09-10 法定代表人由"张三"变更为"李四"' },
-      { label: '历史行为分析', detail: '该客户过去 12 个月 5 次小额延迟付款' },
-      { label: '应收规模评估', detail: '当前应收 ¥178万，单客户风险敞口过大' },
-      { label: 'AI 判定', detail: '中高位风险，建议"开票+调整账期+密切监控"组合动作' },
-    ],
-    sources: ['工商接口', '历史付款记录', '应收规模分析'],
-    related: '关联发票 13 张、关联客户档案',
-  },
-  'event-3': {
-    title: '上海永胜包装 · 主数据缺项 · 风险 85',
-    conclusion: '客户地址、银行、邮箱等 4 项主数据缺失。AI 已通过工商接口拉取候选，可 0.3 秒完成补全。',
-    confidence: 85,
-    confidenceReason: 'AI 自动补全成功率 98%，人工录入成本 ≈ 4 小时',
-    chain: [
-      { label: '主数据扫描', detail: '该客户税号 9131xxxx 缺地址/银行/电话/邮箱' },
-      { label: '工商接口调用', detail: '返回完整工商登记信息（4 项匹配）' },
-      { label: 'AI 验证', detail: '与历史发票信息核对，100% 匹配' },
-      { label: 'AI 建议', detail: '自动补全 + 人工一键确认' },
-    ],
-    sources: ['工商接口', '历史发票档案'],
-    related: '13 张待开发票、该客户历史 38 张发票档案',
-  },
-  'event-4': {
-    title: '经营预警 · 销售增 18% 但回款率降 2.3pp',
-    conclusion: '"增长不收钱"是经营恶化的早期信号。AI 关联分析：销售增 18% 主要来自 5 家高风险客户，建议暂停发货+调整账期。',
-    confidence: 75,
-    confidenceReason: '历史模式匹配 + 多客户关联分析，但非确定信号',
-    chain: [
-      { label: '销售数据分析', detail: '本月销售 ¥2.34亿，环比 +18%' },
-      { label: '回款数据分析', detail: '回款率 82.9%，环比 -2.3pp' },
-      { label: '客户关联分析', detail: '5 家新增高风险客户贡献了 ¥87万 应收' },
-      { label: 'AI 判定', detail: '疑似"增长不收钱"信号，建议暂停 2 家新增客户发货' },
-    ],
-    sources: ['销售数据', '回款数据', '客户风险评分'],
-    related: '销售明细 234 单、回款明细 184 单、5 家高风险客户档案',
-  },
-  'event-5': {
-    title: '上海林达纸业 · 经营异常 · 风险 68',
-    conclusion: '客户被列入经营异常名录 1 周。当前应收 ¥42万，建议密切监控 30 天，92% 应收可挽回。',
-    confidence: 68,
-    confidenceReason: '经营异常是常见状态，单项不构成立即风险',
-    chain: [
-      { label: '工商数据扫描', detail: '2026-09-09 被列入经营异常名录' },
-      { label: '历史行为分析', detail: '该客户 24 个月合作历史，未出现坏账' },
-      { label: 'AI 判定', detail: '中位风险，建议持续监控 30 天' },
-    ],
-    sources: ['工商接口', '历史付款记录'],
-    related: '应收明细 ¥42万',
-  },
-  'event-7': {
-    title: '主数据批量补全 · 5 家客户 13 项缺项',
-    conclusion: 'AI 已为 5 家客户生成 13 项主数据候选。财务一键确认 ≈ 2 分钟（vs 人工录入 4 小时）。',
-    confidence: 90,
-    confidenceReason: '批量操作，AI 匹配准确率 98%+',
-    chain: [
-      { label: '主数据扫描', detail: '5 家客户共缺 13 项：地址/银行/邮箱等' },
-      { label: '批量调用工商接口', detail: '返回 13 项匹配数据' },
-      { label: '与历史发票交叉验证', detail: '100% 匹配' },
-      { label: 'AI 建议', detail: '一键批量确认' },
-    ],
-    sources: ['工商接口', '历史发票档案'],
-    related: '5 家客户档案、13 张待开发票',
-  },
-  'event-safe': {
-    title: '其余 229 家经销商 · 风险评分 < 50',
-    conclusion: '低风险，无异常。AI 持续监控中，下次扫描 3 小时后。',
-    confidence: 95,
-    confidenceReason: '基于工商/税务/经营多源监控数据，评级 < 50 为低风险',
-    chain: [
-      { label: '多源数据扫描', detail: '工商 + 税务 + 经营 多维度扫描' },
-      { label: '风险评分', detail: '229 家评分 < 50，无异常特征' },
-      { label: 'AI 判定', detail: '低风险，常规监控' },
-    ],
-    sources: ['工商接口', '税务接口', '经营异常库'],
-    related: '229 家客户档案、风险评分明细',
-  },
-};
-
-// 模式切换
-document.querySelectorAll('.mode-btn').forEach(btn => {
-  btn.addEventListener('click', () => {
-    const mode = btn.dataset.mode;
-    document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    // 工作模式：显示工作区快捷入口 + 工作台子切换；智能体模式：显示智能体列表 + 工具区
-    document.querySelectorAll('[data-mode-content]').forEach(el => {
-      el.style.display = (el.dataset.modeContent === mode) ? '' : 'none';
-    });
-    document.querySelectorAll('[data-mode-section]').forEach(el => {
-      el.style.display = (el.dataset.modeSection === mode) ? '' : 'none';
-    });
-  });
-});
-
-// 工作台子切换：历史对话 / 定时任务
-document.querySelectorAll('.sub-tab').forEach(tab => {
-  tab.addEventListener('click', () => {
-    const target = tab.dataset.subtab;
-    // tab 按钮 active 类切换
-    document.querySelectorAll('.sub-tab').forEach(t => t.classList.remove('active'));
-    tab.classList.add('active');
-    // panel 显隐：用 inline style 强制覆盖（最高优先级）
-    document.querySelectorAll('.sub-tab-panel').forEach(p => {
-      if (p.dataset.subpanel === target) {
-        p.style.display = '';
-        p.classList.add('active');
-      } else {
-        p.style.display = 'none';
-        p.classList.remove('active');
-      }
-    });
-  });
-});
-
-// 智能体切换
-document.querySelectorAll('.agent-item').forEach(item => {
-  item.addEventListener('click', () => {
-    const target = item.dataset.agent;
-    document.querySelectorAll('.agent-item').forEach(i => i.classList.remove('active'));
-    document.querySelectorAll('.agent-panel').forEach(p => p.classList.remove('active'));
-    item.classList.add('active');
-    document.querySelector(`[data-panel="${target}"]`).classList.add('active');
-    document.getElementById('main-title').textContent = '金光 AI 财智能体驾驶舱';
-    switchView(target);
-  });
-});
-
-// 统一视图切换：所有有 data-view 的元素点击 → 切到对应右侧 view-panel
-function switchView(viewId) {
-  document.querySelectorAll('.view-panel, .agent-panel').forEach(p => p.classList && p.classList.remove('active'));
-  const target = document.querySelector(`[data-view-panel="${viewId}"]`);
-  if (target && target.classList) target.classList.add('active');
-  // 更新主标题
-  const titles = {
-    'agent-cockpit': '🪖 智能体驾驶舱',
-    'agent-billing': '智能开票专员 · 王二',
-    'agent-risk': '风险预警官 · 陈三',
-    'data-board': '数据看板',
-    'new-task': '＋ 新建任务',
-    'skill': '技能',
-    'history-1': '上海永胜包装 · 主数据确认',
-    'history-2': '浙江光华印务 · 风险处置',
-    'history-3': '苏州金鹏贸易 · 停止开票',
-    'history-4': '5 家主数据批量补全',
-    'history-5': '月初认证率盘点',
-    'schedule-1': '每日风险扫描',
-    'schedule-2': '周末应收提醒',
-    'schedule-3': '月度合规报告',
-    'schedule-4': '季度税务预警',
-    'tool-cap': '能力中心',
-    'tool-kb': '知识库',
-    'tool-mgr': '智能体管理',
-  };
-  document.getElementById('main-title').textContent = titles[viewId] || '金光 AI 财工作台';
-}
-
-        // 数据看板：数字滚动动画
-        function animateCounter(el) {
-          const target = parseFloat(el.dataset.counter);
-          const suffix = el.dataset.suffix || '';
-          const duration = 1500;
-          const start = performance.now();
-          const isFloat = target % 1 !== 0;
-          const step = (now) => {
-            const t = Math.min(1, (now - start) / duration);
-            const eased = 1 - Math.pow(1 - t, 3); // easeOutCubic
-            const current = target * eased;
-            el.textContent = (isFloat ? current.toFixed(1) : Math.round(current)) + (isFloat ? ' ' + suffix : suffix);
-            if (t < 1) requestAnimationFrame(step);
-          };
-          requestAnimationFrame(step);
-        }
-
-        // 重写 switchView：切到 data-board 时启动数字动画
-        const _origSwitchView = window.switchView;
-        window.switchView = function(viewId) {
-          if (_origSwitchView) _origSwitchView(viewId);
-          if (viewId === 'data-board') {
-            document.querySelectorAll('[data-counter]').forEach(animateCounter);
-          }
-        };
-
-
-// 绑定所有 data-view 元素的点击
-document.querySelectorAll('[data-view]').forEach(el => {
-  el.addEventListener('click', () => {
-    const viewId = el.dataset.view;
-    // 智能体模式下，激活左侧智能体项
-    if (el.classList && el.classList.contains('agent-item')) {
-      document.querySelectorAll('.agent-item').forEach(i => i.classList && i.classList.remove('active'));
-      el.classList.add('active');
-    }
-    switchView(viewId);
-  });
-});
-
-// Modal
-function openModal(id) {
-  const data = EVIDENCE[id];
-  if (!data) return;
-  document.getElementById('modal-title').textContent = data.title;
-  document.getElementById('modal-body').innerHTML = `
-    <div class="evidence-summary">
-      <div class="evidence-summary-title">💡 AI 结论摘要</div>
-      <div class="evidence-summary-text">${data.conclusion}</div>
-      <div class="evidence-confidence">
-        <span class="confidence-tag">置信度 ${data.confidence}%</span>
-        <div class="confidence-bar"><div class="confidence-bar-fill" style="width:${data.confidence}%;"></div></div>
-        <span style="color: var(--ink-3); font-size: 10px;">${data.confidenceReason}</span>
-      </div>
-    </div>
-    <div class="evidence-chain">
-      <div class="evidence-chain-title">🔍 判断依据链</div>
-      ${data.chain.map((s, i) => `
-        <div class="evidence-step">
-          <div class="evidence-step-num">${i+1}</div>
-          <div class="evidence-step-content">
-            <div class="label">${s.label}</div>
-            <div class="detail">${s.detail}</div>
-          </div>
-        </div>
-      `).join('')}
-    </div>
-    <div>
-      <div class="evidence-chain-title">📚 数据来源</div>
-      <div class="evidence-sources">
-        ${data.sources.map(s => `<span class="source-chip">${s}</span>`).join('')}
-      </div>
-    </div>
-    <div class="evidence-related"><b>关联上下文：</b>${data.related}</div>
-  `;
-  document.getElementById('modal-mask').classList.add('open');
-}
-function closeModal() {
-  document.getElementById('modal-mask').classList.remove('open');
-}
-document.querySelectorAll('.event-card').forEach(card => {
-  card.addEventListener('click', () => {
-    const id = card.dataset.event;
-    if (id && EVIDENCE[id]) openModal(id);
-  });
-});
-document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
-</script>
 
 <div class="view-panel" data-view-panel="tool-mgr">
         <div style="padding: 24px; background: var(--canvas); min-height: calc(100vh - 60px);">
@@ -2296,4 +2008,316 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal()
           </div>
 
 </div></div>
+      </div><!-- /.views-container -->
+    </div>
+  </main>
+
+</div>
+
+</div>
+
+<!-- AI 依据 Modal -->
+<div class="modal-mask" id="modal-mask" onclick="if(event.target===this) closeModal()">
+  <div class="modal">
+    <div class="modal-header">
+      <div>
+        <div class="modal-title" id="modal-title">AI 依据详情</div>
+        <div class="modal-sub" id="modal-sub">基于 AI 智能体判断</div>
+      </div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body" id="modal-body"></div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeModal()">关闭</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const EVIDENCE = {
+  'event-1': {
+    title: '苏州金鹏贸易 · 税务非正常户 · 风险 92',
+    conclusion: '该客户已被税务机关认定为"税务非正常户"，继续开票将面临进项转出风险 ¥96万。AI 建议立即停止合作。',
+    confidence: 92,
+    confidenceReason: '多源数据交叉验证：工商异常 + 税务非正常 + 5天内风险陡增',
+    chain: [
+      { label: '工商数据扫描', detail: '2026-09-12 检测到"列入经营异常名录"' },
+      { label: '税务数据扫描', detail: '2026-09-11 被认定为"税务非正常户"' },
+      { label: '风险特征匹配', detail: '匹配历史坏账案例 3 项，相似度 87%' },
+      { label: 'AI 综合判定', detail: '高风险，建议立即停止开票' },
+    ],
+    sources: ['工商接口', '税务接口', '历史坏账案例库', '风险特征模型'],
+    related: '关联客户档案、关联发票 96万、关联历史坏账案例 3 个',
+  },
+  'event-2': {
+    title: '浙江光华印务 · 法人变更 + 13 张待开 · 风险 88',
+    conclusion: '客户法人变更后，商业存在异常。结合 13 张待开 ¥178万 应收，AI 建议立即开票+调整账期。',
+    confidence: 88,
+    confidenceReason: '法人变更信号 + 应收规模大 + 距月底申报窗口期紧',
+    chain: [
+      { label: '法人变更检测', detail: '2026-09-10 法定代表人由"张三"变更为"李四"' },
+      { label: '历史行为分析', detail: '该客户过去 12 个月 5 次小额延迟付款' },
+      { label: '应收规模评估', detail: '当前应收 ¥178万，单客户风险敞口过大' },
+      { label: 'AI 判定', detail: '中高位风险，建议"开票+调整账期+密切监控"组合动作' },
+    ],
+    sources: ['工商接口', '历史付款记录', '应收规模分析'],
+    related: '关联发票 13 张、关联客户档案',
+  },
+  'event-3': {
+    title: '上海永胜包装 · 主数据缺项 · 风险 85',
+    conclusion: '客户地址、银行、邮箱等 4 项主数据缺失。AI 已通过工商接口拉取候选，可 0.3 秒完成补全。',
+    confidence: 85,
+    confidenceReason: 'AI 自动补全成功率 98%，人工录入成本 ≈ 4 小时',
+    chain: [
+      { label: '主数据扫描', detail: '该客户税号 9131xxxx 缺地址/银行/电话/邮箱' },
+      { label: '工商接口调用', detail: '返回完整工商登记信息（4 项匹配）' },
+      { label: 'AI 验证', detail: '与历史发票信息核对，100% 匹配' },
+      { label: 'AI 建议', detail: '自动补全 + 人工一键确认' },
+    ],
+    sources: ['工商接口', '历史发票档案'],
+    related: '13 张待开发票、该客户历史 38 张发票档案',
+  },
+  'event-4': {
+    title: '经营预警 · 销售增 18% 但回款率降 2.3pp',
+    conclusion: '"增长不收钱"是经营恶化的早期信号。AI 关联分析：销售增 18% 主要来自 5 家高风险客户，建议暂停发货+调整账期。',
+    confidence: 75,
+    confidenceReason: '历史模式匹配 + 多客户关联分析，但非确定信号',
+    chain: [
+      { label: '销售数据分析', detail: '本月销售 ¥2.34亿，环比 +18%' },
+      { label: '回款数据分析', detail: '回款率 82.9%，环比 -2.3pp' },
+      { label: '客户关联分析', detail: '5 家新增高风险客户贡献了 ¥87万 应收' },
+      { label: 'AI 判定', detail: '疑似"增长不收钱"信号，建议暂停 2 家新增客户发货' },
+    ],
+    sources: ['销售数据', '回款数据', '客户风险评分'],
+    related: '销售明细 234 单、回款明细 184 单、5 家高风险客户档案',
+  },
+  'event-5': {
+    title: '上海林达纸业 · 经营异常 · 风险 68',
+    conclusion: '客户被列入经营异常名录 1 周。当前应收 ¥42万，建议密切监控 30 天，92% 应收可挽回。',
+    confidence: 68,
+    confidenceReason: '经营异常是常见状态，单项不构成立即风险',
+    chain: [
+      { label: '工商数据扫描', detail: '2026-09-09 被列入经营异常名录' },
+      { label: '历史行为分析', detail: '该客户 24 个月合作历史，未出现坏账' },
+      { label: 'AI 判定', detail: '中位风险，建议持续监控 30 天' },
+    ],
+    sources: ['工商接口', '历史付款记录'],
+    related: '应收明细 ¥42万',
+  },
+  'event-7': {
+    title: '主数据批量补全 · 5 家客户 13 项缺项',
+    conclusion: 'AI 已为 5 家客户生成 13 项主数据候选。财务一键确认 ≈ 2 分钟（vs 人工录入 4 小时）。',
+    confidence: 90,
+    confidenceReason: '批量操作，AI 匹配准确率 98%+',
+    chain: [
+      { label: '主数据扫描', detail: '5 家客户共缺 13 项：地址/银行/邮箱等' },
+      { label: '批量调用工商接口', detail: '返回 13 项匹配数据' },
+      { label: '与历史发票交叉验证', detail: '100% 匹配' },
+      { label: 'AI 建议', detail: '一键批量确认' },
+    ],
+    sources: ['工商接口', '历史发票档案'],
+    related: '5 家客户档案、13 张待开发票',
+  },
+  'event-safe': {
+    title: '其余 229 家经销商 · 风险评分 < 50',
+    conclusion: '低风险，无异常。AI 持续监控中，下次扫描 3 小时后。',
+    confidence: 95,
+    confidenceReason: '基于工商/税务/经营多源监控数据，评级 < 50 为低风险',
+    chain: [
+      { label: '多源数据扫描', detail: '工商 + 税务 + 经营 多维度扫描' },
+      { label: '风险评分', detail: '229 家评分 < 50，无异常特征' },
+      { label: 'AI 判定', detail: '低风险，常规监控' },
+    ],
+    sources: ['工商接口', '税务接口', '经营异常库'],
+    related: '229 家客户档案、风险评分明细',
+  },
+};
+
+// 模式切换
+// ===== 模式与默认视图（避免首屏/切换后主区空白）=====
+const MODE_DEFAULT_VIEW = { work: 'new-task', agent: 'agent-billing' };
+const WORK_VIEWS  = ['new-task','skill','data-board','history-1','history-2','history-3','history-4','history-5','schedule-1'];
+const AGENT_VIEWS = ['agent-cockpit','agent-billing','agent-risk','tool-mgr','tool-cap','tool-kb'];
+function currentView() {
+  const el = document.querySelector('.view-panel.active');
+  return el ? el.dataset.viewPanel : null;
+}
+
+document.querySelectorAll('.mode-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const mode = btn.dataset.mode;
+    document.querySelector('.demo-sidebar').dataset.mode = mode;
+    document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    // 工作模式：显示工作区快捷入口 + 工作台子切换；智能体模式：显示智能体列表 + 工具区
+    document.querySelectorAll('[data-mode-content]').forEach(el => {
+      el.style.display = (el.dataset.modeContent === mode) ? '' : 'none';
+    });
+    document.querySelectorAll('[data-mode-section]').forEach(el => {
+      el.style.display = (el.dataset.modeSection === mode) ? '' : 'none';
+    });
+    // 保证切换后主内容区有内容（当前面板不属于该模式则切默认视图）
+    const cur = currentView();
+    const pool = (mode === 'agent') ? AGENT_VIEWS : WORK_VIEWS;
+    if (!cur || pool.indexOf(cur) === -1) switchView(MODE_DEFAULT_VIEW[mode] || 'new-task');
+  });
+});
+
+// 工作台子切换：历史对话 / 定时任务
+document.querySelectorAll('.sub-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    const target = tab.dataset.subtab;
+    // tab 按钮 active 类切换
+    document.querySelectorAll('.sub-tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    // panel 显隐：用 inline style 强制覆盖（最高优先级）
+    document.querySelectorAll('.sub-tab-panel').forEach(p => {
+      if (p.dataset.subpanel === target) {
+        p.style.display = '';
+        p.classList.add('active');
+      } else {
+        p.style.display = 'none';
+        p.classList.remove('active');
+      }
+    });
+  });
+});
+
+// 智能体切换
+document.querySelectorAll('.agent-item').forEach(item => {
+  item.addEventListener('click', () => {
+    const target = item.dataset.agent;
+    document.querySelectorAll('.agent-item').forEach(i => i.classList.remove('active'));
+    document.querySelectorAll('.agent-panel').forEach(p => p.classList.remove('active'));
+    item.classList.add('active');
+    // 注意：页面中不存在 [data-panel] 元素（panel 用 data-view-panel），
+    // 此处必须判空，否则会抛错并中断后面的标题更新与 switchView。
+    const legacyPanel = document.querySelector(`[data-panel="${target}"]`);
+    if (legacyPanel && legacyPanel.classList) legacyPanel.classList.add('active');
+    document.getElementById('main-title').textContent = '金光 AI 财智能体驾驶舱';
+    switchView(target);
+  });
+});
+
+// 统一视图切换：所有有 data-view 的元素点击 → 切到对应右侧 view-panel
+function switchView(viewId) {
+  document.querySelectorAll('.view-panel, .agent-panel').forEach(p => p.classList && p.classList.remove('active'));
+  const target = document.querySelector(`[data-view-panel="${viewId}"]`);
+  if (target && target.classList) target.classList.add('active');
+  // 更新主标题
+  const titles = {
+    'agent-cockpit': '🪖 智能体驾驶舱',
+    'agent-billing': '智能开票专员 · 王二',
+    'agent-risk': '风险预警官 · 陈三',
+    'data-board': '数据看板',
+    'new-task': '＋ 新建任务',
+    'skill': '技能',
+    'history-1': '上海永胜包装 · 主数据确认',
+    'history-2': '浙江光华印务 · 风险处置',
+    'history-3': '苏州金鹏贸易 · 停止开票',
+    'history-4': '5 家主数据批量补全',
+    'history-5': '月初认证率盘点',
+    'schedule-1': '每日风险扫描',
+    'schedule-2': '周末应收提醒',
+    'schedule-3': '月度合规报告',
+    'schedule-4': '季度税务预警',
+    'tool-cap': '能力中心',
+    'tool-kb': '知识库',
+    'tool-mgr': '智能体管理',
+  };
+  document.getElementById('main-title').textContent = titles[viewId] || '金光 AI 财工作台';
+}
+
+        // 数据看板：数字滚动动画
+        function animateCounter(el) {
+          const target = parseFloat(el.dataset.counter);
+          const suffix = el.dataset.suffix || '';
+          const duration = 1500;
+          const start = performance.now();
+          const isFloat = target % 1 !== 0;
+          const step = (now) => {
+            const t = Math.min(1, (now - start) / duration);
+            const eased = 1 - Math.pow(1 - t, 3); // easeOutCubic
+            const current = target * eased;
+            el.textContent = (isFloat ? current.toFixed(1) : Math.round(current)) + (isFloat ? ' ' + suffix : suffix);
+            if (t < 1) requestAnimationFrame(step);
+          };
+          requestAnimationFrame(step);
+        }
+
+        // 重写 switchView：切到 data-board 时启动数字动画
+        const _origSwitchView = window.switchView;
+        window.switchView = function(viewId) {
+          if (_origSwitchView) _origSwitchView(viewId);
+          if (viewId === 'data-board') {
+            document.querySelectorAll('[data-counter]').forEach(animateCounter);
+          }
+        };
+
+
+// 绑定所有 data-view 元素的点击
+document.querySelectorAll('[data-view]').forEach(el => {
+  el.addEventListener('click', () => {
+    const viewId = el.dataset.view;
+    // 智能体模式下，激活左侧智能体项
+    if (el.classList && el.classList.contains('agent-item')) {
+      document.querySelectorAll('.agent-item').forEach(i => i.classList && i.classList.remove('active'));
+      el.classList.add('active');
+    }
+    switchView(viewId);
+  });
+});
+
+// Modal
+function openModal(id) {
+  const data = EVIDENCE[id];
+  if (!data) return;
+  document.getElementById('modal-title').textContent = data.title;
+  document.getElementById('modal-body').innerHTML = `
+    <div class="evidence-summary">
+      <div class="evidence-summary-title">💡 AI 结论摘要</div>
+      <div class="evidence-summary-text">${data.conclusion}</div>
+      <div class="evidence-confidence">
+        <span class="confidence-tag">置信度 ${data.confidence}%</span>
+        <div class="confidence-bar"><div class="confidence-bar-fill" style="width:${data.confidence}%;"></div></div>
+        <span style="color: var(--ink-3); font-size: 10px;">${data.confidenceReason}</span>
+      </div>
+    </div>
+    <div class="evidence-chain">
+      <div class="evidence-chain-title">🔍 判断依据链</div>
+      ${data.chain.map((s, i) => `
+        <div class="evidence-step">
+          <div class="evidence-step-num">${i+1}</div>
+          <div class="evidence-step-content">
+            <div class="label">${s.label}</div>
+            <div class="detail">${s.detail}</div>
+          </div>
+        </div>
+      `).join('')}
+    </div>
+    <div>
+      <div class="evidence-chain-title">📚 数据来源</div>
+      <div class="evidence-sources">
+        ${data.sources.map(s => `<span class="source-chip">${s}</span>`).join('')}
+      </div>
+    </div>
+    <div class="evidence-related"><b>关联上下文：</b>${data.related}</div>
+  `;
+  document.getElementById('modal-mask').classList.add('open');
+}
+function closeModal() {
+  document.getElementById('modal-mask').classList.remove('open');
+}
+document.querySelectorAll('.event-card').forEach(card => {
+  card.addEventListener('click', () => {
+    const id = card.dataset.event;
+    if (id && EVIDENCE[id]) openModal(id);
+  });
+});
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+// ===== 首屏初始化：激活默认视图，避免打开即白屏 =====
+if (!currentView()) switchView(MODE_DEFAULT_VIEW.work);
+</script>
+
 </body></html>
