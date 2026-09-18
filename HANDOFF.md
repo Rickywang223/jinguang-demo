@@ -365,6 +365,75 @@ function openModal(id) {
 
 ---
 
+## 🆕 七·六、R002 实现说明：智能体驾驶舱 v2（决策优先）（2026-09-18）
+
+> 需求文档：`.changes/R002-cockpit-redesign.md`
+
+### 改了什么
+
+`agent-cockpit` 从**6 区纵向堆叠**（274 行）重构为 **3 块布局**（49 行）：
+
+```
+┌──────────────────────────────────────────────────────┐
+│ 🎯 待我决策 · N 单                    [全部同意 →]    │  ← 最高视觉权重
+│   [高] 🚨 苏州金鹏 · 税务非正常户   [✓同意][✗拒绝][详情] │
+│   [中] ⚠ 浙江光华 · 法人变更        [✓同意][✗拒绝][详情] │
+│   [中] ⚠ 上海林达 · 经营异常        ...                │
+│   [低] ✅ 上海永胜 · 4 项主数据缺失  ...                │
+├───────────────────────────┬──────────────────────────┤
+│ ⚡ 智能体团队运行态        │ 📊 今日事件流             │
+│   进度条 + % + ETA        │ 🚨 异常预警               │
+│ 🚀 快捷调度（6 入口）      │ 🤖 AI 智能洞察            │
+└───────────────────────────┴──────────────────────────┘
+```
+
+### 🚫 硬约束：本面板禁止资金数字
+
+整个 `agent-cockpit` **不允许出现 `¥` / 万元 / 亿元 / 敞口 / 挽回损失** 等表述。
+只使用业务运营类数字（事件数 / 客户数 / 进度 % / 效率 +12%）。
+
+> 原因见 R002 第 12 节：评委是 AI 财会业务专家，讲业务问题比讲金额更显真实；
+> 金额应留给用户在「详情」里看，不该出现在驾驶舱列表。
+
+### 新增 CSS（均限定或专用于 cockpit）
+
+| class | 作用 |
+|:--|:--|
+| `[data-view-panel="agent-cockpit"] .dash-card` / `.card-header` | **限定作用域**，因其它 panel 也用这两个 class 名（靠 inline style），不能全局定义 |
+| `.cockpit-wrap` | 面板容器（padding + `height: calc(100vh - 60px)` + `overflow-y: auto`） |
+| `.cockpit-decision-zone` | 决策区（红色左边框 4px + 阴影 = 最高权重） |
+| `.decision-card` / `.priority-high\|mid\|low` / `.decision-tag` | 决策卡与优先级色块（红/金/绿） |
+| `.btn-decision` / `.btn-approve` / `.btn-reject` / `.btn-detail` | 决策按钮 |
+| `.cockpit-grid` / `.cockpit-col` | 中部左右分栏 |
+| `.agent-progress-*` | 运行态进度条 |
+| `.event-item` / `.event-status.done\|paused\|warn` | 事件流 |
+| `.mini-list` / `.mini-list-item.urgent\|warning` | 预警与洞察列表 |
+| `.quick-actions` | 快捷调度 3×2 网格 |
+| `#toast` / `#toast.show` | 全局轻提示（新增，R002 引入） |
+
+### 新增 JS
+
+| 名称 | 作用 |
+|:--|:--|
+| `DECISIONS` / `AGENTS_RUNNING` / `TODAY_EVENTS` / `ALERTS` / `INSIGHTS` / `QUICK_ACTIONS` | 驾驶舱数据源 |
+| `renderDecisions()` | 渲染决策卡（含优先级 tag 与三个按钮） |
+| `renderAgentsRunning()` / `renderTodayEvents()` / `renderMiniList()` / `renderQuickActions()` | 各区块渲染 |
+| `bindCockpit()` | 事件委托：**点卡片 → 复用 `openModal()` 打开依据**；单卡同意/拒绝；一键全部同意；快捷调度 toast |
+| `showToast(msg)` | 轻提示（新引入；之前项目里没有） |
+
+### 单屏验证（1440×900）
+
+实测：`.cockpit-wrap` 的 `scrollHeight === clientHeight`（**overflow = 0**），
+决策区 300px + 中部 407px 恰好填满，**无需滚动**。
+
+### ⚠️ 实现注意
+
+1. 决策卡「详情」与点卡片本体都走 `openModal(eventId)`，复用既有 `EVIDENCE` 数据
+2. `[data-view-panel="agent-cockpit"]` 前缀的 CSS 是**故意加的作用域**——去掉会影响 `tool-mgr` 等同样使用 `.dash-card` 的 panel
+3. 决策数据里 `eventId` 需对应 `EVIDENCE` 的 key（当前用 event-1/2/5/3）
+
+---
+
 ## ⚠️ 八、已知问题（建议优先解决）
 
 ### 高优先级

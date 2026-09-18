@@ -793,6 +793,100 @@
   .agent-split-left { border-bottom: 1px solid var(--line); }
   .chat-messages { max-height: 45vh; }
 }
+
+/* ============ R002：智能体驾驶舱 v2（决策优先） ============ */
+/* 注意：下方 .dash-card / .card-header 选择器限定在 cockpit 内，
+   避免影响其它同样使用这两个 class 名的 panel（它们靠 inline style）。 */
+[data-view-panel="agent-cockpit"] .dash-card {
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  padding: 14px 18px;
+  margin-bottom: 12px;
+}
+[data-view-panel="agent-cockpit"] .dash-card:last-child { margin-bottom: 0; }
+[data-view-panel="agent-cockpit"] .card-header {
+  display: flex; justify-content: space-between; align-items: center;
+  font-size: 13px; font-weight: 600; color: var(--ink-1);
+  margin-bottom: 10px;
+}
+.cockpit-wrap { padding: 18px 22px; background: var(--canvas); height: calc(100vh - 60px); overflow-y: auto; }
+.cockpit-decision-zone {
+  border: 1px solid var(--line-2);
+  border-left: 4px solid var(--danger);
+  box-shadow: 0 2px 10px rgba(26, 31, 46, 0.05);
+  padding: 16px 20px;
+  margin-bottom: 12px;
+}
+.decision-title { font-size: 17px; font-weight: 700; color: var(--ink-1); }
+.decision-title .decision-count { color: var(--danger); }
+.decision-sub { font-size: 11px; color: var(--ink-3); margin-top: 3px; }
+.decision-card {
+  display: flex; align-items: center; gap: 12px;
+  padding: 10px 14px; background: var(--paper);
+  border: 1px solid var(--line); border-left: 3px solid var(--danger);
+  border-radius: var(--r); margin-top: 8px; cursor: pointer; transition: all 0.2s;
+}
+.decision-card:hover { border-color: var(--brass); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(140, 106, 58, 0.08); }
+.decision-card.priority-high { border-left-color: var(--danger); }
+.decision-card.priority-mid  { border-left-color: var(--brass); }
+.decision-card.priority-low  { border-left-color: var(--success); }
+.decision-card-main { flex: 1; min-width: 0; }
+.decision-card-title { font-size: 13px; font-weight: 600; color: var(--ink-1); }
+.decision-card-meta { font-size: 11px; color: var(--ink-3); margin-top: 3px; }
+.decision-tag { font-size: 10px; padding: 2px 7px; border-radius: 8px; white-space: nowrap; }
+.decision-tag.priority-high { background: rgba(185,52,44,0.1); color: var(--danger); }
+.decision-tag.priority-mid  { background: rgba(140,106,58,0.12); color: var(--brass); }
+.decision-tag.priority-low  { background: rgba(46,158,91,0.1); color: var(--success); }
+.btn-decision { height: 26px; padding: 0 10px; font-size: 11px; border-radius: var(--r); cursor: pointer; font-family: inherit; white-space: nowrap; }
+.btn-approve { background: var(--ink-1); color: var(--paper); border: 1px solid var(--ink-1); }
+.btn-reject  { background: transparent; color: var(--ink-2); border: 1px solid var(--line-2); }
+.btn-detail  { background: transparent; color: var(--ink-3); border: 1px solid transparent; }
+.btn-detail:hover { color: var(--brass); }
+
+.cockpit-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; align-items: start; }
+.cockpit-col { display: flex; flex-direction: column; }
+
+.agent-progress-row { display: flex; align-items: center; gap: 10px; padding: 7px 0; }
+.agent-progress-name { font-size: 12px; color: var(--ink-1); width: 108px; flex-shrink: 0; }
+.agent-progress-task { font-size: 11px; color: var(--ink-3); width: 76px; flex-shrink: 0; }
+.agent-progress-bar-mini { flex: 1; height: 4px; background: var(--line); border-radius: 2px; overflow: hidden; min-width: 36px; }
+.agent-progress-bar-fill { height: 100%; background: var(--brass); border-radius: 2px; transition: width 0.3s; }
+.agent-progress-pct { font-size: 11px; color: var(--ink-2); width: 32px; text-align: right; flex-shrink: 0; }
+.agent-progress-eta { font-size: 10px; color: var(--ink-3); width: 58px; text-align: right; flex-shrink: 0; }
+
+.event-item { display: flex; align-items: center; gap: 8px; padding: 5px 0; font-size: 12px; color: var(--ink-1); border-bottom: 1px solid var(--line-2); }
+.event-item:last-child { border-bottom: none; }
+.event-time { color: var(--ink-3); font-size: 11px; width: 38px; flex-shrink: 0; }
+.event-company { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.event-status { font-size: 11px; flex-shrink: 0; }
+.event-status.done   { color: var(--success); }
+.event-status.paused { color: var(--danger); }
+.event-status.warn   { color: var(--brass); }
+
+.mini-list { display: flex; flex-direction: column; gap: 5px; }
+.mini-list-item { display: flex; align-items: flex-start; gap: 7px; font-size: 12px; color: var(--ink-2); line-height: 1.5; }
+.mini-list-item .ico { flex-shrink: 0; }
+.mini-list-item.urgent { color: var(--danger); }
+.mini-list-item.warning { color: var(--brass); }
+
+.quick-actions { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.quick-actions button {
+  padding: 9px 6px; border: 1px solid var(--line); background: var(--paper);
+  border-radius: var(--r); cursor: pointer; font-size: 11px; font-family: inherit;
+  color: var(--ink-2); transition: all 0.2s;
+}
+.quick-actions button:hover { border-color: var(--brass); color: var(--brass); }
+
+#toast {
+  position: fixed; left: 50%; bottom: 40px; transform: translateX(-50%) translateY(12px);
+  background: var(--ink-1); color: var(--paper); padding: 10px 18px;
+  border-radius: var(--r); font-size: 12px; opacity: 0; pointer-events: none;
+  transition: all 0.25s; z-index: 9999;
+}
+#toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+@media (max-width: 1100px) { .cockpit-grid { grid-template-columns: 1fr; } }
 </style>
 </head>
 <body>
@@ -899,279 +993,54 @@
     <div class="main-content">
       <div class="views-container">
       <div class="view-panel" data-view-panel="agent-cockpit">
-        <div style="padding: 24px; background: var(--canvas); height: calc(100vh - 60px); overflow-y: auto;">
+        <div class="cockpit-wrap">
 
-          <!-- 区 1：智能体团队状态（顶部 1 长卡） -->
-          <div class="dash-kpi-strip" style="padding: 18px 24px 20px;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+          <!-- 区 1：待我决策（视觉权重最高） -->
+          <div class="dash-card cockpit-decision-zone">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
               <div>
-                <div style="font-size: 14px; font-weight: 600; color: var(--ink-1);">🪖 智能体团队状态</div>
-                <div style="font-size: 11px; color: var(--ink-3); margin-top: 2px;">3 个在线 · 0 离线 · 实时同步</div>
+                <div class="decision-title">🎯 待我决策 <span class="decision-count" id="decision-count"></span></div>
+                <div class="decision-sub">AI 等待你拍板的工作 · 按优先级排序 · 点卡片查看依据</div>
               </div>
-              <button class="btn-ghost">⚙ 配置中心</button>
+              <button class="btn-primary" data-action="approve-all" style="height: 32px; padding: 0 16px;">全部同意 →</button>
             </div>
-            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0; padding-top: 12px; border-top: 1px solid var(--line);">
-              <div style="padding: 10px 14px; display: flex; align-items: center; gap: 12px;">
-                <span style="width: 8px; height: 8px; border-radius: 4px; background: var(--success); box-shadow: 0 0 8px var(--success);"></span>
-                <div style="flex: 1;">
-                  <div style="font-size: 13px; font-weight: 500; color: var(--ink-1);">⚠️ 风险预警官</div>
-                  <div style="font-size: 11px; color: var(--ink-3); margin-top: 2px;">集团风险扫描 · 进度 67%</div>
-                </div>
-                <span style="font-size: 11px; color: var(--success); background: rgba(46, 158, 91, 0.1); padding: 2px 8px; border-radius: 8px;">在线运行</span>
-              </div>
-              <div style="padding: 10px 14px; border-left: 1px solid var(--line); display: flex; align-items: center; gap: 12px;">
-                <span style="width: 8px; height: 8px; border-radius: 4px; background: var(--success); box-shadow: 0 0 8px var(--success);"></span>
-                <div style="flex: 1;">
-                  <div style="font-size: 13px; font-weight: 500; color: var(--ink-1);">⚡ 智能开票专员</div>
-                  <div style="font-size: 11px; color: var(--ink-3); margin-top: 2px;">自动开票 287 张 · 4.2 小时</div>
-                </div>
-                <span style="font-size: 11px; color: var(--success); background: rgba(46, 158, 91, 0.1); padding: 2px 8px; border-radius: 8px;">在线运行</span>
-              </div>
-              <div style="padding: 10px 14px; border-left: 1px solid var(--line); display: flex; align-items: center; gap: 12px;">
-                <span style="width: 8px; height: 8px; border-radius: 4px; background: var(--brass);"></span>
-                <div style="flex: 1;">
-                  <div style="font-size: 13px; font-weight: 500; color: var(--ink-1);">🔧 客户补全专员</div>
-                  <div style="font-size: 11px; color: var(--ink-3); margin-top: 2px;">待补全 5 家 · 18 项</div>
-                </div>
-                <span style="font-size: 11px; color: var(--brass); background: rgba(140, 106, 58, 0.12); padding: 2px 8px; border-radius: 8px;">待你确认</span>
-              </div>
-            </div>
+            <div id="decision-list"></div>
           </div>
 
-          <!-- 区 2：智能体工作卡片（3 张大卡并排） -->
-          <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 16px;">
-            <div class="dash-card" style="margin-bottom: 0; border-left: 3px solid var(--danger);">
-              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                <div style="display: flex; align-items: center; gap: 8px;">
-                  <span style="font-size: 18px;">⚠️</span>
-                  <div style="font-size: 13px; font-weight: 600; color: var(--ink-1);">风险预警官</div>
-                </div>
-                <span style="font-size: 10px; color: var(--paper); background: var(--danger); padding: 2px 8px; border-radius: 8px; font-weight: 600;">高优先级</span>
+          <!-- 区 2：中部左右分栏 -->
+          <div class="cockpit-grid">
+
+            <!-- 左列：团队运行态 + 快捷调度 -->
+            <div class="cockpit-col">
+              <div class="dash-card">
+                <div class="card-header"><span>⚡ 智能体团队运行态</span><span style="font-size: 11px; font-weight: 400; color: var(--ink-3);">3 在线 · 0 异常</span></div>
+                <div id="agents-running"></div>
               </div>
-              <div style="font-size: 11px; color: var(--ink-3); margin-bottom: 4px;">今日动作</div>
-              <div style="font-size: 12px; color: var(--ink-1); margin-bottom: 8px;">集团风险扫描 <span style="color: var(--ink-3);">234 / 350 家</span></div>
-              <div style="font-size: 11px; color: var(--ink-3); margin-bottom: 4px;">发现</div>
-              <div style="font-size: 12px; color: var(--ink-1); margin-bottom: 8px;">5 家异常，3 家高风险敞口 <b style="color: var(--danger);">¥87万</b></div>
-              <div style="font-size: 11px; color: var(--ink-3); margin-bottom: 4px;">下一步</div>
-              <div style="font-size: 12px; color: var(--ink-2); margin-bottom: 12px;">建议生成集团风控报告，等待你的确认</div>
-              <button class="btn-primary" style="width: 100%; height: 32px;" onclick="switchView('agent-risk')">进入智能体 →</button>
+              <div class="dash-card">
+                <div class="card-header"><span>🚀 快捷调度</span></div>
+                <div class="quick-actions" id="quick-actions"></div>
+              </div>
             </div>
 
-            <div class="dash-card" style="margin-bottom: 0; border-left: 3px solid var(--success);">
-              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                <div style="display: flex; align-items: center; gap: 8px;">
-                  <span style="font-size: 18px;">⚡</span>
-                  <div style="font-size: 13px; font-weight: 600; color: var(--ink-1);">智能开票专员</div>
-                </div>
-                <span style="font-size: 10px; color: var(--success); background: rgba(46, 158, 91, 0.1); padding: 2px 8px; border-radius: 8px; font-weight: 600;">正常执行</span>
+            <!-- 右列：事件流 + 预警 + AI 洞察 -->
+            <div class="cockpit-col">
+              <div class="dash-card">
+                <div class="card-header"><span>📊 今日事件流</span></div>
+                <div id="today-events"></div>
               </div>
-              <div style="font-size: 11px; color: var(--ink-3); margin-bottom: 4px;">今日动作</div>
-              <div style="font-size: 12px; color: var(--ink-1); margin-bottom: 8px;">自动开票 287 张 <span style="color: var(--ink-3);">¥324,500</span></div>
-              <div style="font-size: 11px; color: var(--ink-3); margin-bottom: 4px;">发现</div>
-              <div style="font-size: 12px; color: var(--ink-1); margin-bottom: 8px;">3 张需人工确认（苏州金鹏 ¥18,500 / ¥96,000）</div>
-              <div style="font-size: 11px; color: var(--ink-3); margin-bottom: 4px;">下一步</div>
-              <div style="font-size: 12px; color: var(--ink-2); margin-bottom: 12px;">等待财务确认后继续执行</div>
-              <button class="btn-primary" style="width: 100%; height: 32px;" onclick="switchView('agent-billing')">进入智能体 →</button>
+              <div class="dash-card">
+                <div class="card-header"><span>🚨 异常预警</span></div>
+                <div class="mini-list" id="alerts-list"></div>
+              </div>
+              <div class="dash-card">
+                <div class="card-header"><span>🤖 AI 智能洞察</span></div>
+                <div class="mini-list" id="insights-list"></div>
+              </div>
             </div>
 
-            <div class="dash-card" style="margin-bottom: 0; border-left: 3px solid var(--brass);">
-              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                <div style="display: flex; align-items: center; gap: 8px;">
-                  <span style="font-size: 18px;">🔧</span>
-                  <div style="font-size: 13px; font-weight: 600; color: var(--ink-1);">客户补全专员</div>
-                </div>
-                <span style="font-size: 10px; color: var(--brass); background: rgba(140, 106, 58, 0.12); padding: 2px 8px; border-radius: 8px; font-weight: 600;">待你确认</span>
-              </div>
-              <div style="font-size: 11px; color: var(--ink-3); margin-bottom: 4px;">今日动作</div>
-              <div style="font-size: 12px; color: var(--ink-1); margin-bottom: 8px;">批量补全 5 家客户 18 项主数据</div>
-              <div style="font-size: 11px; color: var(--ink-3); margin-bottom: 4px;">发现</div>
-              <div style="font-size: 12px; color: var(--ink-1); margin-bottom: 8px;">待你确认 4 单（永胜/金鹏/新天/华诚）</div>
-              <div style="font-size: 11px; color: var(--ink-3); margin-bottom: 4px;">下一步</div>
-              <div style="font-size: 12px; color: var(--ink-2); margin-bottom: 12px;">补全后将自动触发开票流程</div>
-              <button class="btn-primary" style="width: 100%; height: 32px;" onclick="switchView('agent-billing')">进入智能体 →</button>
-            </div>
           </div>
-
-          <!-- 区 3：待我确认（4 单纵向） -->
-          <div class="dash-card" style="padding: 18px 22px;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
-              <div>
-                <div style="font-size: 14px; font-weight: 600; color: var(--ink-1);">⏰ 待我确认 · 4 单</div>
-                <div style="font-size: 11px; color: var(--ink-3); margin-top: 2px;">AI 等待你拍板的工作 · 点击同意/拒绝</div>
-              </div>
-              <button class="btn-ghost">[✓ 全部同意]</button>
-            </div>
-
-            <div style="display: flex; flex-direction: column; gap: 10px;">
-              <div style="display: flex; gap: 12px; padding: 12px 14px; background: rgba(185, 52, 44, 0.05); border: 1px solid rgba(185, 52, 44, 0.15); border-radius: var(--r); border-left: 3px solid var(--danger);">
-                <div style="flex-shrink: 0; width: 60px;">
-                  <div style="font-size: 11px; color: var(--ink-3);">来源</div>
-                  <div style="font-size: 12px; color: var(--ink-1); font-weight: 500;">⚠️ 风险预警官</div>
-                </div>
-                <div style="flex: 1;">
-                  <div style="font-size: 13px; font-weight: 600; color: var(--ink-1); margin-bottom: 4px;">苏州金鹏 · 税务非正常户</div>
-                  <div style="font-size: 12px; color: var(--ink-2); margin-bottom: 4px;"><b>影响：</b>若继续开票，进项转出风险 <b style="color: var(--danger);">¥96万</b></div>
-                  <div style="font-size: 12px; color: var(--ink-2);"><b>AI 建议：</b>立即停止开票，启动法务催收</div>
-                </div>
-                <div style="display: flex; flex-direction: column; gap: 6px; flex-shrink: 0;">
-                  <button class="btn-primary" style="height: 28px; padding: 0 14px; font-size: 11px;">✓ 同意</button>
-                  <button class="btn-cancel" style="height: 28px; padding: 0 14px; font-size: 11px;">✗ 拒绝</button>
-                </div>
-              </div>
-
-              <div style="display: flex; gap: 12px; padding: 12px 14px; background: rgba(140, 106, 58, 0.05); border: 1px solid rgba(140, 106, 58, 0.15); border-radius: var(--r); border-left: 3px solid var(--brass);">
-                <div style="flex-shrink: 0; width: 60px;">
-                  <div style="font-size: 11px; color: var(--ink-3);">来源</div>
-                  <div style="font-size: 12px; color: var(--ink-1); font-weight: 500;">⚠️ 风险预警官</div>
-                </div>
-                <div style="flex: 1;">
-                  <div style="font-size: 13px; font-weight: 600; color: var(--ink-1); margin-bottom: 4px;">浙江光华 · 法人变更</div>
-                  <div style="font-size: 12px; color: var(--ink-2); margin-bottom: 4px;"><b>影响：</b>欠款 <b style="color: var(--brass);">¥178万</b>，账期 90 → 30 天</div>
-                  <div style="font-size: 12px; color: var(--ink-2);"><b>AI 建议：</b>暂缓新增发货，等新法人资金到位</div>
-                </div>
-                <div style="display: flex; flex-direction: column; gap: 6px; flex-shrink: 0;">
-                  <button class="btn-primary" style="height: 28px; padding: 0 14px; font-size: 11px;">✓ 同意</button>
-                  <button class="btn-cancel" style="height: 28px; padding: 0 14px; font-size: 11px;">✗ 拒绝</button>
-                </div>
-              </div>
-
-              <div style="display: flex; gap: 12px; padding: 12px 14px; background: rgba(185, 52, 44, 0.05); border: 1px solid rgba(185, 52, 44, 0.15); border-radius: var(--r); border-left: 3px solid var(--danger);">
-                <div style="flex-shrink: 0; width: 60px;">
-                  <div style="font-size: 11px; color: var(--ink-3);">来源</div>
-                  <div style="font-size: 12px; color: var(--ink-1); font-weight: 500;">⚡ 开票专员</div>
-                </div>
-                <div style="flex: 1;">
-                  <div style="font-size: 13px; font-weight: 600; color: var(--ink-1); margin-bottom: 4px;">苏州金鹏 ¥18,500</div>
-                  <div style="font-size: 12px; color: var(--ink-2); margin-bottom: 4px;"><b>影响：</b>客户已停止合作，继续开票将面临税务异常</div>
-                  <div style="font-size: 12px; color: var(--ink-2);"><b>AI 建议：</b>停止开票，归档待查</div>
-                </div>
-                <div style="display: flex; flex-direction: column; gap: 6px; flex-shrink: 0;">
-                  <button class="btn-primary" style="height: 28px; padding: 0 14px; font-size: 11px;">✓ 同意</button>
-                  <button class="btn-cancel" style="height: 28px; padding: 0 14px; font-size: 11px;">✗ 拒绝</button>
-                </div>
-              </div>
-
-              <div style="display: flex; gap: 12px; padding: 12px 14px; background: rgba(46, 158, 91, 0.05); border: 1px solid rgba(46, 158, 91, 0.15); border-radius: var(--r); border-left: 3px solid var(--success);">
-                <div style="flex-shrink: 0; width: 60px;">
-                  <div style="font-size: 11px; color: var(--ink-3);">来源</div>
-                  <div style="font-size: 12px; color: var(--ink-1); font-weight: 500;">🔧 补全专员</div>
-                </div>
-                <div style="flex: 1;">
-                  <div style="font-size: 13px; font-weight: 600; color: var(--ink-1); margin-bottom: 4px;">上海永胜 4 项主数据</div>
-                  <div style="font-size: 12px; color: var(--ink-2); margin-bottom: 4px;"><b>影响：</b>主数据缺失 4 项，无法开票 <b style="color: var(--success);">¥124,500</b></div>
-                  <div style="font-size: 12px; color: var(--ink-2);"><b>AI 建议：</b>从工商接口拉取，立即补全</div>
-                </div>
-                <div style="display: flex; flex-direction: column; gap: 6px; flex-shrink: 0;">
-                  <button class="btn-primary" style="height: 28px; padding: 0 14px; font-size: 11px;">✓ 同意</button>
-                  <button class="btn-cancel" style="height: 28px; padding: 0 14px; font-size: 11px;">✗ 拒绝</button>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- 区 4：正在执行 -->
-          <div class="dash-card" style="padding: 18px 22px;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
-              <div>
-                <div style="font-size: 14px; font-weight: 600; color: var(--ink-1);">⚙️ 正在执行 · 3 个任务</div>
-                <div style="font-size: 11px; color: var(--ink-3); margin-top: 2px;">AI 自动运行中的任务 · 可手动暂停</div>
-              </div>
-              <button class="btn-ghost">⏸ 暂停全部</button>
-            </div>
-            <div style="display: flex; flex-direction: column; gap: 14px;">
-              <div>
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-                  <div style="font-size: 13px; font-weight: 500; color: var(--ink-1);">🛡 每日风险扫描</div>
-                  <div style="display: flex; gap: 12px; align-items: center; font-size: 11px; color: var(--ink-3);">
-                    <span>扫描 234 / 350 家</span>
-                    <span>预计完成 16:00</span>
-                  </div>
-                </div>
-                <div style="height: 6px; background: var(--line); border-radius: 3px; overflow: hidden;">
-                  <div style="height: 100%; width: 67%; background: var(--success); border-radius: 3px;"></div>
-                </div>
-              </div>
-              <div>
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-                  <div style="font-size: 13px; font-weight: 500; color: var(--ink-1);">⚡ 自动开票任务</div>
-                  <div style="display: flex; gap: 12px; align-items: center; font-size: 11px; color: var(--ink-3);">
-                    <span>开票 287 / 320 张</span>
-                    <span>预计完成 18:30</span>
-                  </div>
-                </div>
-                <div style="height: 6px; background: var(--line); border-radius: 3px; overflow: hidden;">
-                  <div style="height: 100%; width: 89%; background: var(--success); border-radius: 3px;"></div>
-                </div>
-              </div>
-              <div>
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-                  <div style="font-size: 13px; font-weight: 500; color: var(--ink-1);">📅 月度合规报告</div>
-                  <div style="display: flex; gap: 12px; align-items: center; font-size: 11px; color: var(--ink-3);">
-                    <span>收集 89 / 380 单据</span>
-                    <span>预计完成 09-20</span>
-                  </div>
-                </div>
-                <div style="height: 6px; background: var(--line); border-radius: 3px; overflow: hidden;">
-                  <div style="height: 100%; width: 23%; background: var(--brass); border-radius: 3px;"></div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- 区 5 + 区 6 双列布局 -->
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 24px;">
-            <div class="dash-card" style="padding: 18px 22px; margin-bottom: 0;">
-              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
-                <div style="font-size: 14px; font-weight: 600; color: var(--ink-1);">🔧 能力与工具状态</div>
-                <button class="btn-ghost">配置中心 →</button>
-              </div>
-              <div style="display: flex; flex-direction: column; gap: 10px;">
-                <div style="display: flex; align-items: center; gap: 10px;">
-                  <span style="width: 8px; height: 8px; border-radius: 4px; background: var(--success);"></span>
-                  <span style="flex: 1; font-size: 12px;">票易通 MCP</span>
-                  <span style="font-size: 11px; color: var(--ink-3);">今日 387 次</span>
-                </div>
-                <div style="display: flex; align-items: center; gap: 10px;">
-                  <span style="width: 8px; height: 8px; border-radius: 4px; background: var(--success);"></span>
-                  <span style="flex: 1; font-size: 12px;">乐企直连</span>
-                  <span style="font-size: 11px; color: var(--ink-3);">今日 92 次</span>
-                </div>
-                <div style="display: flex; align-items: center; gap: 10px;">
-                  <span style="width: 8px; height: 8px; border-radius: 4px; background: var(--brass);"></span>
-                  <span style="flex: 1; font-size: 12px;">工商数据接口</span>
-                  <span style="font-size: 11px; color: var(--brass);">剩余 23/1000 次</span>
-                </div>
-                <div style="display: flex; align-items: center; gap: 10px;">
-                  <span style="width: 8px; height: 8px; border-radius: 4px; background: var(--success);"></span>
-                  <span style="flex: 1; font-size: 12px;">风险评分模型</span>
-                  <span style="font-size: 11px; color: var(--ink-3);">v3.2.1</span>
-                </div>
-                <div style="display: flex; align-items: center; gap: 10px;">
-                  <span style="width: 8px; height: 8px; border-radius: 4px; background: var(--success);"></span>
-                  <span style="flex: 1; font-size: 12px;">金蝶 ERP</span>
-                  <span style="font-size: 11px; color: var(--ink-3);">实时同步中</span>
-                </div>
-              </div>
-            </div>
-
-            <div class="dash-card" style="padding: 18px 22px; margin-bottom: 0;">
-              <div style="font-size: 14px; font-weight: 600; color: var(--ink-1); margin-bottom: 14px;">🚀 快捷调度</div>
-              <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px;">
-                <button class="btn-primary" style="height: 36px; padding: 0 10px; font-size: 11px;">⚡ 一键风险扫描</button>
-                <button class="btn-primary" style="height: 36px; padding: 0 10px; font-size: 11px;">🌅 智能体晨报</button>
-                <button class="btn-primary" style="height: 36px; padding: 0 10px; font-size: 11px;">📋 集团风控报告</button>
-                <button class="btn-primary" style="height: 36px; padding: 0 10px; font-size: 11px;">🔍 全量客户盘点</button>
-                <button class="btn-primary" style="height: 36px; padding: 0 10px; font-size: 11px;">📊 月度合规报告</button>
-                <button class="btn-primary" style="height: 36px; padding: 0 10px; font-size: 11px;">📤 批量补全</button>
-                <button class="btn-primary" style="height: 36px; padding: 0 10px; font-size: 11px;">🤖 AI 团队周报</button>
-                <button class="btn-cancel" style="height: 36px; padding: 0 10px; font-size: 11px;">⏸ 全部暂停</button>
-                <button class="btn-cancel" style="height: 36px; padding: 0 10px; font-size: 11px;">⏹ 关闭智能体</button>
-              </div>
-            </div>
-          </div>
-
         </div>
-      </div>      <!-- ===== 视图：智能开票专员驾驶舱（含聊天区） ===== -->
+      </div>
       <div class="view-panel" data-view-panel="agent-billing">
         <div class="agent-split-layout">
           <!-- 左区：聊天窗口 -->
@@ -2654,6 +2523,182 @@ document.querySelectorAll('.dashboard-tabs').forEach(bar => {
 // 初始化聊天历史
 Object.keys(AGENT_CHAT).forEach(renderChat);
 
-</script>
+
+// ============ R002：智能体驾驶舱 v2（决策优先） ============
+// 约束：整个 cockpit 不出现任何金额（¥ / 万元 / 亿元）
+
+const DECISIONS = [
+  { id: 'dec-1', priority: 'high', agentIcon: '🚨', title: '苏州金鹏 · 税务非正常户',
+    impact: '若继续开票，进项转出风险严重', suggestion: '立即停止开票 + 启动法务催收',
+    time: '11:45', eventId: 'event-1' },
+  { id: 'dec-2', priority: 'mid', agentIcon: '⚠', title: '浙江光华 · 法人变更',
+    impact: '账期策略需要重新评估', suggestion: '账期 90→30 天 + 暂缓发货',
+    time: '13:18', eventId: 'event-2' },
+  { id: 'dec-3', priority: 'mid', agentIcon: '⚠', title: '上海林达 · 经营异常',
+    impact: '出现经营异常信号，需补充尽调', suggestion: '暂停发货 + 补充尽调材料',
+    time: '15:02', eventId: 'event-5' },
+  { id: 'dec-4', priority: 'low', agentIcon: '✅', title: '上海永胜 · 4 项主数据缺失',
+    impact: '影响开票信息准确性', suggestion: '自动补全并回写主数据',
+    time: '14:32', eventId: 'event-3' }
+];
+
+const AGENTS_RUNNING = [
+  { id: 'agent-risk',     icon: '⚠', name: '风险预警官',   task: '集团风险扫描', progress: 67, eta: 'ETA 16:00', color: 'var(--brass)' },
+  { id: 'agent-billing',  icon: '⚡', name: '智能开票专员', task: '自动开票',     progress: 89, eta: 'ETA 18:30', color: 'var(--success)' },
+  { id: 'agent-complete', icon: '🔧', name: '客户补全专员', task: '待确认',       progress: 0,  eta: '待你拍板',  color: 'var(--line-2)' }
+];
+
+const TODAY_EVENTS = [
+  { time: '14:32', company: '上海永胜', text: '主数据补全完成',   status: 'done' },
+  { time: '11:45', company: '苏州金鹏', text: '触发风险拦截',     status: 'paused' },
+  { time: '10:21', company: '5 家批量', text: '主数据批量补全',   status: 'done' },
+  { time: '09:15', company: '月初盘点', text: '认证率盘点完成',   status: 'done' }
+];
+
+const ALERTS = [
+  { level: 'urgent',  icon: '🚨', text: '1 家客户已停业（紧急）' },
+  { level: 'warning', icon: '⚠',  text: '2 家客户法人变更' },
+  { level: 'info',    icon: 'ℹ',  text: '5 家客户工商地址变更（低风险）' }
+];
+
+const INSIGHTS = [
+  { icon: '🔍', text: '增长不收钱（回款率 -2.3pp）' },
+  { icon: '📈', text: '3 家新增高风险客户，建议重点关注' },
+  { icon: '⚡', text: '自动开票效率 +12%' }
+];
+
+const QUICK_ACTIONS = ['⚡ 一键风险扫描', '🌅 智能体晨报', '📋 集团风控报告',
+                       '🔍 全量客户盘点', '📊 月度合规报告', '📤 批量补全'];
+
+const STATUS_ICON = { done: '✓', paused: '⏸', warn: '⚠' };
+const PRIORITY_LABEL = { high: '高', mid: '中', low: '低' };
+
+function showToast(msg) {
+  let t = document.getElementById('toast');
+  if (!t) { t = document.createElement('div'); t.id = 'toast'; document.body.appendChild(t); }
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => t.classList.remove('show'), 1800);
+}
+
+function renderDecisions() {
+  const box = document.getElementById('decision-list');
+  const cnt = document.getElementById('decision-count');
+  if (!box) return;
+  const left = DECISIONS.filter(d => !d.done);
+  if (cnt) cnt.textContent = '· ' + left.length + ' 单';
+  if (!left.length) {
+    box.innerHTML = '<div style="padding: 18px 0; text-align: center; color: var(--ink-3); font-size: 12px;">✅ 全部已处理</div>';
+    return;
+  }
+  box.innerHTML = left.map(d =>
+    '<div class="decision-card priority-' + d.priority + '" data-id="' + d.id + '">'
+    + '<span class="decision-tag priority-' + d.priority + '">' + PRIORITY_LABEL[d.priority] + '</span>'
+    + '<div class="decision-card-main">'
+    +   '<div class="decision-card-title">' + d.agentIcon + ' ' + d.title + '</div>'
+    +   '<div class="decision-card-meta">AI 建议：' + d.suggestion + ' · 影响：' + d.impact + '</div>'
+    + '</div>'
+    + '<button class="btn-decision btn-approve" data-act="approve" data-id="' + d.id + '">✓ 同意</button>'
+    + '<button class="btn-decision btn-reject" data-act="reject" data-id="' + d.id + '">✗ 拒绝</button>'
+    + '<button class="btn-decision btn-detail" data-act="detail" data-id="' + d.id + '">详情</button>'
+    + '</div>').join('');
+}
+
+function renderAgentsRunning() {
+  const box = document.getElementById('agents-running');
+  if (!box) return;
+  box.innerHTML = AGENTS_RUNNING.map(a =>
+    '<div class="agent-progress-row">'
+    + '<span class="agent-progress-name">' + a.icon + ' ' + a.name + '</span>'
+    + '<span class="agent-progress-task">' + a.task + '</span>'
+    + '<span class="agent-progress-bar-mini"><span class="agent-progress-bar-fill" style="width: ' + a.progress + '%; background: ' + a.color + ';"></span></span>'
+    + '<span class="agent-progress-pct">' + a.progress + '%</span>'
+    + '<span class="agent-progress-eta">' + a.eta + '</span>'
+    + '</div>').join('');
+}
+
+function renderTodayEvents() {
+  const box = document.getElementById('today-events');
+  if (!box) return;
+  box.innerHTML = TODAY_EVENTS.map(e =>
+    '<div class="event-item">'
+    + '<span class="event-time">' + e.time + '</span>'
+    + '<span class="event-company">' + e.company + ' · ' + e.text + '</span>'
+    + '<span class="event-status ' + e.status + '">' + (STATUS_ICON[e.status] || '') + '</span>'
+    + '</div>').join('');
+}
+
+function renderMiniList(id, items) {
+  const box = document.getElementById(id);
+  if (!box) return;
+  box.innerHTML = items.map(a =>
+    '<div class="mini-list-item ' + (a.level || '') + '">'
+    + '<span class="ico">' + a.icon + '</span><span>' + a.text + '</span></div>').join('');
+}
+
+function renderQuickActions() {
+  const box = document.getElementById('quick-actions');
+  if (!box) return;
+  box.innerHTML = QUICK_ACTIONS.map(t => '<button type="button">' + t + '</button>').join('');
+}
+
+// —— 交互绑定 ——
+function bindCockpit() {
+  const list = document.getElementById('decision-list');
+  if (list) {
+    list.addEventListener('click', e => {
+      const btn = e.target.closest('button[data-act]');
+      const card = e.target.closest('.decision-card');
+      const id = (btn && btn.dataset.id) || (card && card.dataset.id);
+      const d = DECISIONS.find(x => x.id === id);
+      if (!d) return;
+
+      if (btn) {
+        e.stopPropagation();
+        if (btn.dataset.act === 'detail') {
+          if (d.eventId && EVIDENCE[d.eventId]) openModal(d.eventId);
+          else showToast('暂无更多依据');
+          return;
+        }
+        d.done = true;
+        showToast((btn.dataset.act === 'approve' ? '已同意：' : '已拒绝：') + d.title);
+        renderDecisions();
+        return;
+      }
+      // 点卡片本体 → 打开依据
+      if (d.eventId && EVIDENCE[d.eventId]) openModal(d.eventId);
+    });
+  }
+
+  const all = document.querySelector('[data-action="approve-all"]');
+  if (all) {
+    all.addEventListener('click', () => {
+      const left = DECISIONS.filter(d => !d.done);
+      if (!left.length) { showToast('没有待决策事项'); return; }
+      left.forEach(d => { d.done = true; });
+      showToast('已一键同意 ' + left.length + ' 项决策');
+      renderDecisions();
+    });
+  }
+
+  const qa = document.getElementById('quick-actions');
+  if (qa) {
+    qa.addEventListener('click', e => {
+      const b = e.target.closest('button');
+      if (b) showToast('已启动：' + b.textContent.trim());
+    });
+  }
+}
+
+renderDecisions();
+renderAgentsRunning();
+renderTodayEvents();
+renderMiniList('alerts-list', ALERTS);
+renderMiniList('insights-list', INSIGHTS);
+renderQuickActions();
+bindCockpit();
+
+</script></script>
 
 </body></html>
