@@ -833,7 +833,10 @@
 .decision-card.priority-low  { border-left-color: var(--success); }
 .decision-card-main { flex: 1; min-width: 0; }
 .decision-card-title { font-size: 13px; font-weight: 600; color: var(--ink-1); }
-.decision-card-meta { font-size: 11px; color: var(--ink-3); margin-top: 3px; }
+.decision-card-meta { font-size: 11px; color: var(--ink-3); margin-top: 3px; line-height: 1.5; }
+/* R004：决策卡整行式（标题 / 影响 / AI 建议 三行 + 右侧按钮） */
+.dash-decision-card { align-items: flex-start; }
+.dash-decision-card .decision-card-title { display: flex; align-items: center; gap: 7px; }
 .decision-tag { font-size: 10px; padding: 2px 7px; border-radius: 8px; white-space: nowrap; }
 .decision-tag.priority-high { background: rgba(185,52,44,0.1); color: var(--danger); }
 .decision-tag.priority-mid  { background: rgba(140,106,58,0.12); color: var(--brass); }
@@ -1305,27 +1308,23 @@
             <div id="board-decision-list" style="margin-top: 10px;"></div>
           </div>
 
-          <!-- 区 3：🚨 异常预警 + 🤖 AI 智能洞察（R003 从驾驶舱迁入） -->
-          <div class="board-zone weight-mid">
-            <div class="board-two-col">
-              <div>
-                <div class="board-zone-title">🚨 异常预警</div>
-                <div class="mini-list" id="board-alerts"></div>
-              </div>
-              <div>
-                <div class="board-zone-title">🤖 AI 智能洞察</div>
-                <div class="mini-list" id="board-insights"></div>
-              </div>
+          <!-- 区 3 + 4：双列 1:1（左：异常预警 + 今日事件流；右：AI 智能洞察） -->
+          <div class="board-two-col" style="margin-bottom: 16px; align-items: start;">
+            <div class="board-zone" style="margin-bottom: 0;">
+              <div class="board-zone-title">🚨 异常预警</div>
+              <div class="mini-list" id="board-alerts"></div>
+              <div class="board-zone-title" style="margin-top: 18px; margin-bottom: 6px;">📊 今日事件流</div>
+              <div id="board-events"></div>
+            </div>
+            <div class="board-zone" style="margin-bottom: 0;">
+              <div class="board-zone-title">🤖 AI 智能洞察</div>
+              <div class="mini-list" id="board-insights"></div>
             </div>
           </div>
 
-          <!-- 区 4：📊 今日事件流（R003 从驾驶舱迁入） -->
-          <div class="board-zone">
-            <div class="board-zone-title">📊 今日事件流</div>
-            <div id="board-events"></div>
-          </div>
-
-          <!-- 区 2：客户信息补全 -->
+          <!-- 区 5：业务全景（3 张完整大卡，垂直堆叠，内容全部保留） -->
+          <div class="board-zone-title" style="margin: 2px 0 12px 2px;">业务全景</div>
+          <!-- 客户信息补全 -->
           <div class="dash-card">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
               <div style="display: flex; align-items: center; gap: 10px;">
@@ -2701,14 +2700,16 @@ function renderDecisions() {
   }
   box.innerHTML = left.map(d =>
     '<div class="dash-decision-card priority-' + d.priority + '" data-id="' + d.id + '">'
-    + '<span class="decision-tag priority-' + d.priority + '">' + PRIORITY_LABEL[d.priority] + '</span>'
     + '<div class="decision-card-main">'
-    +   '<div class="decision-card-title">' + d.agentIcon + ' ' + d.title + '</div>'
-    +   '<div class="decision-card-meta">AI 建议：' + d.suggestion + ' · 影响：' + d.impact + '</div>'
+    +   '<div class="decision-card-title"><span class="decision-tag priority-' + d.priority + '">' + PRIORITY_LABEL[d.priority] + '</span> ' + d.agentIcon + ' ' + d.title + '</div>'
+    +   '<div class="decision-card-meta">影响：' + d.impact + '</div>'
+    +   '<div class="decision-card-meta">AI 建议：' + d.suggestion + '</div>'
     + '</div>'
-    + '<button class="btn-decision btn-approve" data-act="approve" data-id="' + d.id + '">✓ 同意</button>'
-    + '<button class="btn-decision btn-reject" data-act="reject" data-id="' + d.id + '">✗ 拒绝</button>'
-    + '<button class="btn-decision btn-detail" data-act="detail" data-id="' + d.id + '">详情</button>'
+    + '<div style="display: flex; gap: 8px; flex-shrink: 0;">'
+    +   '<button class="btn-decision btn-approve" data-act="approve" data-id="' + d.id + '">✓ 同意</button>'
+    +   '<button class="btn-decision btn-reject" data-act="reject" data-id="' + d.id + '">✗ 拒绝</button>'
+    +   '<button class="btn-decision btn-detail" data-act="detail" data-id="' + d.id + '">详情</button>'
+    + '</div>'
     + '</div>').join('');
 }
 
