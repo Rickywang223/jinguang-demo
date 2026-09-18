@@ -749,497 +749,6 @@
 
     <div class="main-content">
       <div class="views-container">
-      <!-- ===== Panel 1: 智能开票专员 ===== -->
-      <div class="agent-panel active" data-view-panel="agent-billing">
-
-        <!-- 智能体状态卡 -->
-        <div class="agent-card">
-          <div class="agent-avatar">
-            AI
-            <div class="agent-avatar-sub">开票</div>
-          </div>
-          <div class="agent-info">
-            <div class="agent-status-row">
-              <span class="agent-pulse"></span>
-              <span>正在工作中 · 上次扫描 3 分钟前</span>
-            </div>
-            <div class="agent-name">智能开票专员 · 王二</div>
-            <div class="agent-desc">同时管理 287 张发票、5 家高风险客户、4 项经营预警，所有操作全程留痕。</div>
-          </div>
-          <div class="agent-progress">
-            <div class="agent-progress-label">
-              <span>今日开票进度</span>
-              <span><b>287 / 320</b></span>
-            </div>
-            <div class="agent-progress-bar">
-              <div class="agent-progress-bar-fill" style="width: 89.7%;"></div>
-            </div>
-            <div class="agent-subtasks">
-              <div class="agent-subtask"><span class="agent-subtask-dot done"></span>已自动开票 287 张（耗时 4.2 小时）</div>
-              <div class="agent-subtask"><span class="agent-subtask-dot doing"></span>3 家高危客户待财务确认</div>
-              <div class="agent-subtask"><span class="agent-subtask-dot todo"></span>2 家风险客户待处置</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- KPI -->
-        <div class="kpi-bar">
-          <div class="kpi-card">
-            <div class="label">📦 今日开票</div>
-            <div class="value">287 张</div>
-            <div class="foot">AI 处理 <span class="good">93%</span></div>
-          </div>
-          <div class="kpi-card">
-            <div class="label">⏱ 距月底申报</div>
-            <div class="value">12 天</div>
-            <div class="foot">逾期损失预估 <span class="danger">¥ 38.6万</span></div>
-          </div>
-          <div class="kpi-card">
-            <div class="label">✅ 本月认证率</div>
-            <div class="value">58.3%</div>
-            <div class="foot"><span class="good">↑ 5.2%</span> vs 上月</div>
-          </div>
-          <div class="kpi-card">
-            <div class="label">⚠ 应收预警</div>
-            <div class="value">¥ 87万</div>
-            <div class="foot">5 家客户需关注</div>
-          </div>
-        </div>
-
-        <!-- 事件流（按评分） -->
-        <div class="events">
-          <div class="events-header">
-            <div>
-              <div class="events-title">今日处理事项 · 按紧迫度排序</div>
-              <div class="events-desc">点任一事件查看 AI 完整判断依据</div>
-            </div>
-            <div class="events-summary">
-              <span>🔴 紧急 3</span>
-              <span>🟠 关注 4</span>
-              <span>🟢 常规 1</span>
-            </div>
-          </div>
-
-          <div class="event-card" data-event="event-1">
-            <div class="event-rank red"><div class="event-rank-num">92</div><div class="event-rank-label">紧急</div></div>
-            <div class="event-content">
-              <div class="event-title">
-                苏州金鹏贸易有限公司 · 税务非正常户
-                <span class="event-tag risk">风险预警</span>
-              </div>
-              <div class="event-meta">
-                <span><b>应收 ¥ 96万</b></span><span>· 5 天前被认定税务非正常</span><span>· 已触发 2 项预警</span>
-              </div>
-              <div class="event-loss">若继续开票 → 进项转出风险 <span class="danger">¥ 96万</span></div>
-            </div>
-            <div class="event-actions">
-              <button class="btn-primary" onclick="event.stopPropagation(); openModal('event-1')">⚡ 查看依据</button>
-              <button class="btn-ghost">立即停止</button>
-            </div>
-          </div>
-
-          <div class="event-card" data-event="event-2">
-            <div class="event-rank red"><div class="event-rank-num">88</div><div class="event-rank-label">紧急</div></div>
-            <div class="event-content">
-              <div class="event-title">
-                浙江光华印务有限公司 · 法人变更
-                <span class="event-tag risk">风险预警</span>
-                <span class="event-tag billing">开票异常</span>
-              </div>
-              <div class="event-meta">
-                <span><b>应收 ¥ 178万</b></span><span>· 3 天前法人变更</span><span>· 13 张发票待开</span>
-              </div>
-              <div class="event-loss">法人变更后坏账风险高，若错过本月申报，预估多缴增值税 <span class="danger">¥ 14.9万</span></div>
-            </div>
-            <div class="event-actions">
-              <button class="btn-primary" onclick="event.stopPropagation(); openModal('event-2')">⚡ 一键补全并开票</button>
-              <button class="btn-ghost">暂停发货</button>
-            </div>
-          </div>
-
-          <div class="event-card" data-event="event-3">
-            <div class="event-rank red"><div class="event-rank-num">85</div><div class="event-rank-label">紧急</div></div>
-            <div class="event-content">
-              <div class="event-title">
-                上海永胜包装材料有限公司 · 主数据严重缺项
-                <span class="event-tag billing">开票异常</span>
-              </div>
-              <div class="event-meta">
-                <span><b>待开 ¥ 124,500</b></span><span>· 缺 4 项主数据</span><span>· 距月底 12 天</span>
-              </div>
-              <div class="event-loss">原需财务手动录入地址/银行/电话各 5-10 分钟，<span class="up">AI 0.3 秒完成</span></div>
-            </div>
-            <div class="event-actions">
-              <button class="btn-primary" onclick="event.stopPropagation(); openModal('event-3')">⚡ AI 自动补全</button>
-              <button class="btn-ghost">手动录入</button>
-            </div>
-          </div>
-
-          <div class="event-card" data-event="event-7">
-            <div class="event-rank orange"><div class="event-rank-num">58</div><div class="event-rank-label">关注</div></div>
-            <div class="event-content">
-              <div class="event-title">
-                5 个客户的主数据需要一次性补全
-                <span class="event-tag billing">开票异常</span>
-              </div>
-              <div class="event-meta">
-                <span><b>5 家客户</b></span><span>· 13 项缺项</span><span>· 涉及 ¥ 96,800 待开</span>
-              </div>
-              <div class="event-loss">AI 已生成所有候选，<span class="up">财务一键确认 ≈ 2 分钟</span></div>
-            </div>
-            <div class="event-actions">
-              <button class="btn-primary" onclick="event.stopPropagation(); openModal('event-7')">⚡ 查看候选</button>
-              <button class="btn-ghost">批量确认</button>
-            </div>
-          </div>
-
-          <div class="event-card" data-event="event-safe">
-            <div class="event-rank green"><div class="event-rank-num">✓</div><div class="event-rank-label">常规</div></div>
-            <div class="event-content">
-              <div class="event-title">其余 229 家经销商 · 风险评分 &lt; 50</div>
-              <div class="event-meta">
-                <span>AI 持续监控</span><span>· 下次扫描 3 小时后</span><span>· 当前无异常</span>
-              </div>
-            </div>
-            <div class="event-actions"><button class="btn-ghost">查看完整名单</button></div>
-          </div>
-        </div>
-
-        <!-- AI 智能建议 -->
-        <div class="smart-suggest">
-          <div class="smart-suggest-header">
-            <span class="smart-suggest-icon">⚡</span>
-            <span class="smart-suggest-title">AI 智能建议 · 智能开票专员</span>
-          </div>
-          <div class="smart-suggest-list">
-            <div class="suggest-item">
-              <div class="suggest-num">1</div>
-              <div class="suggest-text">开启 <b>「风险客户自动暂停开票」</b>规则，<br>法人变更/税务异常的经销商自动暂停开票</div>
-              <div class="suggest-actions">
-                <button class="btn-ghost">暂不</button>
-                <button class="btn-ghost">修改建议</button>
-                <button class="btn-primary">立即开启 ⚡</button>
-              </div>
-            </div>
-            <div class="suggest-item">
-              <div class="suggest-num">2</div>
-              <div class="suggest-text">一键处理 <b>3 家高危客户</b>，<br>预计可挽回损失 <b>¥ 33.7万</b></div>
-              <div class="suggest-actions">
-                <button class="btn-ghost">暂不</button>
-                <button class="btn-primary">一键处理 ⚡</button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-      </div>
-
-      <!-- ===== Panel 2: 风险预警官 ===== -->
-      <div class="agent-panel" data-view-panel="agent-risk">
-
-        <div class="agent-card">
-          <div class="agent-avatar">
-            AI
-            <div class="agent-avatar-sub">风险</div>
-          </div>
-          <div class="agent-info">
-            <div class="agent-status-row">
-              <span class="agent-pulse"></span>
-              <span>扫描中 · 已覆盖 234 家经销商</span>
-            </div>
-            <div class="agent-name">风险预警官 · 陈三</div>
-            <div class="agent-desc">7×24 监控下游客户司法/税务/工商异常，触发预警自动通知并启动回款保护。</div>
-          </div>
-          <div class="agent-progress">
-            <div class="agent-progress-label">
-              <span>本月风险扫描</span>
-              <span><b>234 / 234</b></span>
-            </div>
-            <div class="agent-progress-bar">
-              <div class="agent-progress-bar-fill" style="width: 100%;"></div>
-            </div>
-            <div class="agent-subtasks">
-              <div class="agent-subtask"><span class="agent-subtask-dot done"></span>已扫描 234 家经销商</div>
-              <div class="agent-subtask"><span class="agent-subtask-dot doing"></span>5 家高风险待处置</div>
-              <div class="agent-subtask"><span class="agent-subtask-dot todo"></span>本月挽回 ¥87万</div>
-            </div>
-          </div>
-        </div>
-
-        <div class="kpi-bar">
-          <div class="kpi-card">
-            <div class="label">🏢 本月扫描</div>
-            <div class="value">234 家</div>
-            <div class="foot">经销商 234 · 上游 87</div>
-          </div>
-          <div class="kpi-card">
-            <div class="label">🔴 高风险</div>
-            <div class="value">5 家</div>
-            <div class="foot">触发预警已发通知</div>
-          </div>
-          <div class="kpi-card">
-            <div class="label">⏱ 距上次扫描</div>
-            <div class="value">3 小时</div>
-            <div class="foot">AI 7×24 持续监控</div>
-          </div>
-          <div class="kpi-card">
-            <div class="label">💰 本月挽回</div>
-            <div class="value">¥ 87万</div>
-            <div class="foot"><span class="good">↑ 3.2x 投入</span></div>
-          </div>
-        </div>
-
-        <div class="events">
-          <div class="events-header">
-            <div>
-              <div class="events-title">高风险客户 · 立即处置</div>
-              <div class="events-desc">按风险评分排序，5 家已触发预警</div>
-            </div>
-            <div class="events-summary">
-              <span>🔴 高危 2</span>
-              <span>🟠 关注 1</span>
-              <span>🟢 常规 1</span>
-            </div>
-          </div>
-
-          <div class="event-card" data-event="event-1">
-            <div class="event-rank red"><div class="event-rank-num">92</div><div class="event-rank-label">紧急</div></div>
-            <div class="event-content">
-              <div class="event-title">
-                苏州金鹏贸易有限公司 · 税务非正常户
-                <span class="event-tag risk">风险预警</span>
-              </div>
-              <div class="event-meta">
-                <span><b>应收 ¥ 96万</b></span><span>· 5 天前被认定税务非正常</span><span>· 已触发 2 项预警</span>
-              </div>
-              <div class="event-loss">若坏账，预估损失 <span class="danger">¥ 96万</span></div>
-            </div>
-            <div class="event-actions">
-              <button class="btn-primary" onclick="event.stopPropagation(); openModal('event-1')">⚡ 查看依据</button>
-              <button class="btn-ghost">立即停止</button>
-            </div>
-          </div>
-
-          <div class="event-card" data-event="event-2">
-            <div class="event-rank red"><div class="event-rank-num">88</div><div class="event-rank-label">紧急</div></div>
-            <div class="event-content">
-              <div class="event-title">
-                浙江光华印务有限公司 · 法人变更
-                <span class="event-tag risk">风险预警</span>
-              </div>
-              <div class="event-meta">
-                <span><b>应收 ¥ 178万</b></span><span>· 3 天前法人变更</span><span>· 已触发 2 项预警</span>
-              </div>
-              <div class="event-loss">法人变更后坏账风险高，若错过本月申报，预估多缴增值税 <span class="danger">¥ 14.9万</span></div>
-            </div>
-            <div class="event-actions">
-              <button class="btn-primary" onclick="event.stopPropagation(); openModal('event-2')">⚡ 查看依据</button>
-              <button class="btn-ghost">暂停发货</button>
-            </div>
-          </div>
-
-          <div class="event-card" data-event="event-5">
-            <div class="event-rank orange"><div class="event-rank-num">68</div><div class="event-rank-label">关注</div></div>
-            <div class="event-content">
-              <div class="event-title">
-                上海林达纸业有限公司 · 经营异常
-                <span class="event-tag risk">风险预警</span>
-              </div>
-              <div class="event-meta">
-                <span>应收 <b>¥ 42万</b></span><span>· 1 周前被列入经营异常</span><span>· 暂未触发坏账预警</span>
-              </div>
-              <div class="event-loss">建议密切关注 30 天，<span class="up">可挽回 92% 应收</span></div>
-            </div>
-            <div class="event-actions">
-              <button class="btn-primary" onclick="event.stopPropagation(); openModal('event-5')">⚡ 持续监控</button>
-              <button class="btn-ghost">生成报告</button>
-            </div>
-          </div>
-
-          <div class="event-card" data-event="event-safe">
-            <div class="event-rank green"><div class="event-rank-num">✓</div><div class="event-rank-label">常规</div></div>
-            <div class="event-content">
-              <div class="event-title">其余 229 家经销商 · 风险评分 &lt; 50</div>
-              <div class="event-meta">
-                <span>AI 持续监控</span><span>· 下次扫描 3 小时后</span><span>· 当前无异常</span>
-              </div>
-            </div>
-            <div class="event-actions"><button class="btn-ghost">查看完整名单</button></div>
-          </div>
-        </div>
-
-        <div class="smart-suggest">
-          <div class="smart-suggest-header">
-            <span class="smart-suggest-icon">⚡</span>
-            <span class="smart-suggest-title">AI 智能建议 · 风险预警官</span>
-          </div>
-          <div class="smart-suggest-list">
-            <div class="suggest-item">
-              <div class="suggest-num">1</div>
-              <div class="suggest-text">立即停止与 <b>2 家高危客户</b> 合作，<br>浙江光华 + 苏州金鹏，建议暂停发货并启动回款保护</div>
-              <div class="suggest-actions">
-                <button class="btn-ghost">暂不</button>
-                <button class="btn-primary">一键暂停发货 ⚡</button>
-              </div>
-            </div>
-            <div class="suggest-item">
-              <div class="suggest-num">2</div>
-              <div class="suggest-text">为 <b>3 家高风险客户</b> 自动调整账期（90天→30天），<br>预估可挽回 <b>¥ 87万</b></div>
-              <div class="suggest-actions">
-                <button class="btn-ghost">暂不</button>
-                <button class="btn-primary">调整账期</button>
-              </div>
-            </div>
-            <div class="suggest-item">
-              <div class="suggest-num">3</div>
-              <div class="suggest-text">开启 <b>「动态风险扫描」</b>，从月度改为每日，<br>捕捉异常变 <b>更早 7 天</b></div>
-              <div class="suggest-actions">
-                <button class="btn-ghost">暂不</button>
-                <button class="btn-ghost">修改建议</button>
-                <button class="btn-primary">立即开启</button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-      </div>
-
-      <!-- ===== Panel 3: 经营驾驶舱 ===== -->
-      <div class="agent-panel" data-view-panel="agent-kpi">
-
-        <div class="agent-card">
-          <div class="agent-avatar">
-            AI
-            <div class="agent-avatar-sub">经营</div>
-          </div>
-          <div class="agent-info">
-            <div class="agent-status-row">
-              <span class="agent-pulse"></span>
-              <span>实时监控中 · 经营信号</span>
-            </div>
-            <div class="agent-name">经营驾驶舱 · 林一</div>
-            <div class="agent-desc">全链路经营信号分析：采购→生产→销售→回款，异常时主动提醒管理层。</div>
-          </div>
-          <div class="agent-progress">
-            <div class="agent-progress-label">
-              <span>本月经营健康</span>
-              <span><b>82.9%</b></span>
-            </div>
-            <div class="agent-progress-bar">
-              <div class="agent-progress-bar-fill" style="width: 82.9%;"></div>
-            </div>
-            <div class="agent-subtasks">
-              <div class="agent-subtask"><span class="agent-subtask-dot done"></span>采购 / 生产 / 销售 正常</div>
-              <div class="agent-subtask"><span class="agent-subtask-dot doing"></span>回款率 -2.3pp 待分析</div>
-              <div class="agent-subtask"><span class="agent-subtask-dot todo"></span>净利下降 4%</div>
-            </div>
-          </div>
-        </div>
-
-        <div class="kpi-bar">
-          <div class="kpi-card">
-            <div class="label">📊 本月净利</div>
-            <div class="value">¥ 234万</div>
-            <div class="foot"><span class="danger">↓ 4%</span> 销售增回款降</div>
-          </div>
-          <div class="kpi-card">
-            <div class="label">💰 回款率</div>
-            <div class="value">82.9%</div>
-            <div class="foot"><span class="danger">↓ 2.3pp</span> vs 上月</div>
-          </div>
-          <div class="kpi-card">
-            <div class="label">⚠ 应收预警</div>
-            <div class="value">¥ 87万</div>
-            <div class="foot">5 家客户需关注</div>
-          </div>
-          <div class="kpi-card">
-            <div class="label">📈 本月销售</div>
-            <div class="value">¥ 2.34亿</div>
-            <div class="foot"><span class="good">↑ 18%</span> vs 上月</div>
-          </div>
-        </div>
-
-        <div class="events">
-          <div class="events-header">
-            <div>
-              <div class="events-title">经营预警 · 增长不收钱信号</div>
-              <div class="events-desc">销售 +18% 但回款率 -2.3pp，建议立即调整账期</div>
-            </div>
-            <div class="events-summary">
-              <span>🟠 关注 1</span>
-              <span>🟢 常规 1</span>
-            </div>
-          </div>
-
-          <div class="event-card" data-event="event-4">
-            <div class="event-rank orange"><div class="event-rank-num">71</div><div class="event-rank-label">关注</div></div>
-            <div class="event-content">
-              <div class="event-title">
-                本月回款率下降 2.3pp · "增长不收钱"信号
-                <span class="event-tag kpi">经营预警</span>
-              </div>
-              <div class="event-meta">
-                <span><b>销售 +18%</b></span><span>· <b>回款率 82.9%（↓2.3pp）</b></span><span>· 应收周转恶化</span>
-              </div>
-              <div class="event-loss">若不调整，<b>预计下月净利再降 5%</b></div>
-            </div>
-            <div class="event-actions">
-              <button class="btn-primary" onclick="event.stopPropagation(); openModal('event-4')">⚡ 查看诊断</button>
-              <button class="btn-ghost">调整账期</button>
-            </div>
-          </div>
-
-          <div class="event-card" data-event="event-safe">
-            <div class="event-rank green"><div class="event-rank-num">✓</div><div class="event-rank-label">常规</div></div>
-            <div class="event-content">
-              <div class="event-title">采购 / 生产 / 销售环节无异常</div>
-              <div class="event-meta">
-                <span>采购 ¥1.86亿</span><span>· 生产 12.3 万令</span><span>· 销售 ¥2.34亿</span>
-              </div>
-            </div>
-            <div class="event-actions"><button class="btn-ghost">查看全链路</button></div>
-          </div>
-        </div>
-
-        <div class="smart-suggest">
-          <div class="smart-suggest-header">
-            <span class="smart-suggest-icon">⚡</span>
-            <span class="smart-suggest-title">AI 智能建议 · 经营驾驶舱</span>
-          </div>
-          <div class="smart-suggest-list">
-            <div class="suggest-item">
-              <div class="suggest-num">1</div>
-              <div class="suggest-text">暂停与 <b>2 家高风险经销商</b> 合作，<br>预计下月回款率回升 6pp</div>
-              <div class="suggest-actions">
-                <button class="btn-ghost">暂不</button>
-                <button class="btn-primary">查看详情 →</button>
-              </div>
-            </div>
-            <div class="suggest-item">
-              <div class="suggest-num">2</div>
-              <div class="suggest-text">启用 <b>「销售-回款联动预警」</b>，<br>销售增长时自动检查应收健康</div>
-              <div class="suggest-actions">
-                <button class="btn-ghost">暂不</button>
-                <button class="btn-ghost">修改建议</button>
-                <button class="btn-primary">立即开启</button>
-              </div>
-            </div>
-            <div class="suggest-item">
-              <div class="suggest-num">3</div>
-              <div class="suggest-text">AI 已生成 <b>「经营诊断报告」</b>，<br>含 5 项行动建议 + 1 页 PPT 摘要</div>
-              <div class="suggest-actions">
-                <button class="btn-ghost">暂不</button>
-                <button class="btn-ghost">修改建议</button>
-                <button class="btn-primary">查看报告</button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-      </div>
-
-      <!-- ===== 默认视图：工作台模式（数据看板 / 智能开票专员） ===== -->
-            <!-- ===== 视图：智能体驾驶舱（参考税务合伙人 v2） ===== -->
       <div class="view-panel" data-view-panel="agent-cockpit">
         <div style="padding: 24px; background: var(--canvas); height: calc(100vh - 60px); overflow-y: auto;">
 
@@ -1513,11 +1022,124 @@
           </div>
 
         </div>
+      </div>      <!-- ===== 视图：智能开票专员驾驶舱（含聊天区） ===== -->
+      <div class="view-panel" data-view-panel="agent-billing">
+        <div style="display: flex; flex-direction: column; height: calc(100vh - 60px);">
+          <div style="background: var(--paper); border-bottom: 1px solid var(--line); padding: 14px 24px; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0;">
+            <div>
+              <div style="font-size: 14px; font-weight: 600; color: var(--ink-1);">⚡ 智能开票专员 · 王二</div>
+              <div style="font-size: 11px; color: var(--ink-3); margin-top: 2px;">🟢 在线运行 · 287/320 张 · 4.2 小时</div>
+            </div>
+            <button class="btn-ghost">[查看执行结果]</button>
+          </div>
+          <div style="flex: 1; overflow-y: auto; padding: 24px; background: var(--canvas);">
+            <div style="background: linear-gradient(135deg, #1a1f2e 0%, #2a3142 100%); border-radius: var(--r-lg); padding: 20px 24px; color: var(--paper); margin-bottom: 16px;">
+              <div style="display: flex; align-items: center; gap: 14px; margin-bottom: 14px;">
+                <div style="width: 48px; height: 48px; border-radius: 24px; background: var(--brass); color: var(--ink-1); display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 12px; font-weight: 700;">AI<div style="font-size: 8px;">开票</div></div>
+                <div style="flex: 1;"><div style="font-size: 16px; font-weight: 600;">智能开票专员 · 王二</div><div style="font-size: 11px; opacity: 0.7; margin-top: 4px;">同时管理 287 张发票、5 家高风险客户、4 项经营预警</div></div>
+                <span style="font-size: 11px; background: rgba(255,255,255,0.15); padding: 4px 10px; border-radius: 12px;">🟢 在线</span>
+              </div>
+              <div style="display: flex; align-items: center; gap: 12px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,0.15);">
+                <span style="font-size: 11px; opacity: 0.7;">今日开票进度</span>
+                <span style="font-size: 13px; font-weight: 600;">287 / 320</span>
+                <div style="flex: 1; height: 6px; background: rgba(255,255,255,0.2); border-radius: 3px; overflow: hidden;"><div style="height: 100%; width: 89.7%; background: var(--brass); border-radius: 3px;"></div></div>
+                <span style="font-size: 11px; color: var(--brass); font-weight: 600;">89.7%</span>
+              </div>
+            </div>
+            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 16px;">
+              <div style="background: var(--paper); border: 1px solid var(--line); border-radius: var(--r); padding: 14px;"><div style="font-size: 11px; color: var(--ink-3);">📦 今日开票</div><div style="font-size: 20px; font-weight: 700; color: var(--ink-1); margin-top: 4px;">287 张</div><div style="font-size: 10px; color: var(--success); margin-top: 4px;">AI 自动 ¥324,500</div></div>
+              <div style="background: var(--paper); border: 1px solid var(--line); border-radius: var(--r); padding: 14px;"><div style="font-size: 11px; color: var(--ink-3);">💰 月累计</div><div style="font-size: 20px; font-weight: 700; color: var(--ink-1); margin-top: 4px;">¥4.36亿</div><div style="font-size: 10px; color: var(--ink-2); margin-top: 4px;">4128 张</div></div>
+              <div style="background: var(--paper); border: 1px solid var(--line); border-radius: var(--r); padding: 14px;"><div style="font-size: 11px; color: var(--ink-3);">⚠ 待确认</div><div style="font-size: 20px; font-weight: 700; color: var(--danger); margin-top: 4px;">3 张</div><div style="font-size: 10px; color: var(--danger); margin-top: 4px;">¥96,000 拦截</div></div>
+              <div style="background: var(--paper); border: 1px solid var(--line); border-radius: var(--r); padding: 14px;"><div style="font-size: 11px; color: var(--ink-3);">✅ 通过率</div><div style="font-size: 20px; font-weight: 700; color: var(--success); margin-top: 4px;">98.7%</div><div style="font-size: 10px; color: var(--success); margin-top: 4px;">▲ +0.4pp</div></div>
+            </div>
+            <div style="background: var(--paper); border: 1px solid var(--line); border-radius: var(--r-lg); padding: 16px 20px; margin-bottom: 16px;">
+              <div style="font-size: 13px; font-weight: 600; color: var(--ink-1); margin-bottom: 12px;">📋 事件流 · 今日 287 笔</div>
+              <div style="display: flex; flex-direction: column; gap: 8px;">
+                <div class="event-card" data-event="ev-b1" style="padding: 10px 12px; background: var(--canvas); border-radius: var(--r); border-left: 3px solid var(--success); cursor: pointer;"><div style="display: flex; gap: 10px; font-size: 12px;"><span style="color: var(--success);">✓</span><span style="font-weight: 500; color: var(--ink-1);">14:32 上海永胜 · 开票成功</span><span style="color: var(--ink-3); margin-left: auto;">¥124,500</span></div></div>
+                <div class="event-card" data-event="ev-b2" style="padding: 10px 12px; background: var(--canvas); border-radius: var(--r); border-left: 3px solid var(--danger); cursor: pointer;"><div style="display: flex; gap: 10px; font-size: 12px;"><span style="color: var(--danger);">⏸</span><span style="font-weight: 500; color: var(--ink-1);">11:45 苏州金鹏 · 触发拦截</span><span style="color: var(--danger); margin-left: auto;">¥96,000</span></div></div>
+              </div>
+            </div>
+            <div style="background: var(--paper); border: 1px solid var(--line); border-radius: var(--r-lg); padding: 16px 20px; margin-bottom: 16px;">
+              <div style="font-size: 13px; font-weight: 600; color: var(--ink-1); margin-bottom: 12px;">💡 AI 智能建议</div>
+              <div style="padding: 10px 12px; background: rgba(185, 52, 44, 0.05); border: 1px solid rgba(185, 52, 44, 0.2); border-radius: var(--r); border-left: 3px solid var(--danger); font-size: 12px;">
+                <div style="color: var(--ink-1); margin-bottom: 4px;"><b>建议 1：</b>苏州金鹏 ¥96,000 触发风险规则，建议立即停止开票并归档。</div>
+                <div style="display: flex; gap: 8px; margin-top: 6px;"><button class="btn-primary" style="height: 26px; padding: 0 10px; font-size: 11px;">✓ 同意</button><button class="btn-cancel" style="height: 26px; padding: 0 10px; font-size: 11px;">✗ 拒绝</button></div>
+              </div>
+            </div>
+          </div>
+          <div style="background: var(--paper); border-top: 1px solid var(--line); padding: 12px 24px 16px; flex-shrink: 0;">
+            <div style="max-width: 900px; margin: 0 auto;">
+              <div style="font-size: 11px; color: var(--ink-3); margin-bottom: 6px;">💬 与智能开票专员对话</div>
+              <div style="display: flex; gap: 8px; align-items: flex-end; background: var(--canvas); border: 1px solid var(--line); border-radius: var(--r); padding: 8px 12px;">
+                <textarea placeholder="给智能体发消息，例如：帮苏州金鹏手动开 1 张 ¥5000 的发票" rows="1" style="flex: 1; background: transparent; border: none; outline: none; resize: none; font-size: 13px; font-family: inherit; line-height: 1.5;"></textarea>
+                <button class="btn-primary" style="height: 32px; padding: 0 14px;">↑ 发送</button>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
-      <!-- ===== 视图：智能开票专员驾驶舱 ===== -->
-      <div class="view-panel" data-view-panel="agent-billing">
+      <!-- ===== 视图：风险预警官驾驶舱（含聊天区） ===== -->
+      <div class="view-panel" data-view-panel="agent-risk">
+        <div style="display: flex; flex-direction: column; height: calc(100vh - 60px);">
+          <div style="background: var(--paper); border-bottom: 1px solid var(--line); padding: 14px 24px; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0;">
+            <div>
+              <div style="font-size: 14px; font-weight: 600; color: var(--ink-1);">🛡 风险预警官 · 陈三</div>
+              <div style="font-size: 11px; color: var(--ink-3); margin-top: 2px;">🟢 扫描中 · 进度 67% · 234 / 350 家</div>
+            </div>
+            <button class="btn-ghost">[查看扫描结果]</button>
+          </div>
+          <div style="flex: 1; overflow-y: auto; padding: 24px; background: var(--canvas);">
+            <div style="background: linear-gradient(135deg, #1a1f2e 0%, #2a3142 100%); border-radius: var(--r-lg); padding: 20px 24px; color: var(--paper); margin-bottom: 16px;">
+              <div style="display: flex; align-items: center; gap: 14px; margin-bottom: 14px;">
+                <div style="width: 48px; height: 48px; border-radius: 24px; background: var(--danger); color: var(--paper); display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 12px; font-weight: 700;">AI<div style="font-size: 8px;">风险</div></div>
+                <div style="flex: 1;"><div style="font-size: 16px; font-weight: 600;">风险预警官 · 陈三</div><div style="font-size: 11px; opacity: 0.7; margin-top: 4px;">全量客户工商/税务/经营风险实时监控，5 家高风险待处置</div></div>
+                <span style="font-size: 11px; background: rgba(255,255,255,0.15); padding: 4px 10px; border-radius: 12px;">🟢 在线</span>
+              </div>
+              <div style="display: flex; align-items: center; gap: 12px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,0.15);">
+                <span style="font-size: 11px; opacity: 0.7;">扫描进度</span>
+                <span style="font-size: 13px; font-weight: 600;">234 / 350</span>
+                <div style="flex: 1; height: 6px; background: rgba(255,255,255,0.2); border-radius: 3px; overflow: hidden;"><div style="height: 100%; width: 67%; background: var(--brass); border-radius: 3px;"></div></div>
+                <span style="font-size: 11px; color: var(--brass); font-weight: 600;">67%</span>
+              </div>
+            </div>
+            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 16px;">
+              <div style="background: var(--paper); border: 1px solid var(--line); border-radius: var(--r); padding: 14px;"><div style="font-size: 11px; color: var(--ink-3);">🏢 监控客户</div><div style="font-size: 20px; font-weight: 700; color: var(--ink-1); margin-top: 4px;">234 家</div><div style="font-size: 10px; color: var(--ink-2); margin-top: 4px;">全量</div></div>
+              <div style="background: var(--paper); border: 1px solid var(--line); border-radius: var(--r); padding: 14px;"><div style="font-size: 11px; color: var(--ink-3);">🚨 高风险</div><div style="font-size: 20px; font-weight: 700; color: var(--danger); margin-top: 4px;">5 家</div><div style="font-size: 10px; color: var(--danger); margin-top: 4px;">¥87万敞口</div></div>
+              <div style="background: var(--paper); border: 1px solid var(--line); border-radius: var(--r); padding: 14px;"><div style="font-size: 11px; color: var(--ink-3);">⚠ 中风险</div><div style="font-size: 20px; font-weight: 700; color: var(--brass); margin-top: 4px;">12 家</div><div style="font-size: 10px; color: var(--brass); margin-top: 4px;">¥124万敞口</div></div>
+              <div style="background: var(--paper); border: 1px solid var(--line); border-radius: var(--r); padding: 14px;"><div style="font-size: 11px; color: var(--ink-3);">✅ 低风险</div><div style="font-size: 20px; font-weight: 700; color: var(--success); margin-top: 4px;">217 家</div><div style="font-size: 10px; color: var(--ink-2); margin-top: 4px;">正常</div></div>
+            </div>
+            <div style="background: var(--paper); border: 1px solid var(--line); border-radius: var(--r-lg); padding: 16px 20px; margin-bottom: 16px;">
+              <div style="font-size: 13px; font-weight: 600; color: var(--ink-1); margin-bottom: 12px;">📋 事件流 · 今日扫描</div>
+              <div style="display: flex; flex-direction: column; gap: 8px;">
+                <div class="event-card" data-event="ev-r1" style="padding: 10px 12px; background: rgba(185, 52, 44, 0.05); border: 1px solid rgba(185, 52, 44, 0.15); border-radius: var(--r); border-left: 3px solid var(--danger); cursor: pointer;"><div style="display: flex; gap: 10px; font-size: 12px;"><span style="color: var(--danger);">🚨</span><span style="font-weight: 500; color: var(--ink-1);">11:45 苏州金鹏 · 税务非正常户</span><span style="color: var(--danger); margin-left: auto;">¥96万敞口</span></div></div>
+                <div class="event-card" data-event="ev-r2" style="padding: 10px 12px; background: rgba(140, 106, 58, 0.08); border: 1px solid rgba(140, 106, 58, 0.15); border-radius: var(--r); border-left: 3px solid var(--brass); cursor: pointer;"><div style="display: flex; gap: 10px; font-size: 12px;"><span style="color: var(--brass);">⚠</span><span style="font-weight: 500; color: var(--ink-1);">13:18 浙江光华 · 法人变更</span><span style="color: var(--brass); margin-left: auto;">¥178万敞口</span></div></div>
+              </div>
+            </div>
+            <div style="background: var(--paper); border: 1px solid var(--line); border-radius: var(--r-lg); padding: 16px 20px; margin-bottom: 16px;">
+              <div style="font-size: 13px; font-weight: 600; color: var(--ink-1); margin-bottom: 12px;">💡 AI 智能建议</div>
+              <div style="padding: 10px 12px; background: rgba(185, 52, 44, 0.05); border: 1px solid rgba(185, 52, 44, 0.2); border-radius: var(--r); border-left: 3px solid var(--danger); font-size: 12px;">
+                <div style="color: var(--ink-1); margin-bottom: 4px;"><b>建议 1：</b>苏州金鹏已停业，建议立即停止开票 + 启动法务催收。</div>
+                <div style="display: flex; gap: 8px; margin-top: 6px;"><button class="btn-primary" style="height: 26px; padding: 0 10px; font-size: 11px;">✓ 同意</button><button class="btn-cancel" style="height: 26px; padding: 0 10px; font-size: 11px;">✗ 拒绝</button></div>
+              </div>
+            </div>
+          </div>
+          <div style="background: var(--paper); border-top: 1px solid var(--line); padding: 12px 24px 16px; flex-shrink: 0;">
+            <div style="max-width: 900px; margin: 0 auto;">
+              <div style="font-size: 11px; color: var(--ink-3); margin-bottom: 6px;">💬 与风险预警官对话</div>
+              <div style="display: flex; gap: 8px; align-items: flex-end; background: var(--canvas); border: 1px solid var(--line); border-radius: var(--r); padding: 8px 12px;">
+                <textarea placeholder="给智能体发消息，例如：扫描结果生成一份风险周报" rows="1" style="flex: 1; background: transparent; border: none; outline: none; resize: none; font-size: 13px; font-family: inherit; line-height: 1.5;"></textarea>
+                <button class="btn-primary" style="height: 32px; padding: 0 14px;">↑ 发送</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
 
+      
+      
+
+      <!-- ===== 视图：智能开票专员驾驶舱 ===== -->
       <div class="view-panel" data-view-panel="data-board">
         <div style="padding: 24px; background: var(--canvas); height: calc(100vh - 60px); overflow-y: auto;">
 
@@ -2418,8 +2040,7 @@ document.querySelectorAll('.event-card').forEach(card => {
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
 </script>
 
-</body>
-</html<div class="view-panel" data-view-panel="tool-mgr">
+<div class="view-panel" data-view-panel="tool-mgr">
         <div style="padding: 24px; background: var(--canvas); min-height: calc(100vh - 60px);">
 
           <!-- 区 1：顶部总览 -->
@@ -2674,4 +2295,5 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal()
 
           </div>
 
-        </div>>
+</div></div>
+</body></html>
