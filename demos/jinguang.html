@@ -887,6 +887,69 @@
 #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
 @media (max-width: 1100px) { .cockpit-grid { grid-template-columns: 1fr; } }
+
+/* ============ R003：驾驶舱聚焦运行态 + 数据看板扩展 ============ */
+/* 驾驶舱智能体卡片（3 列网格） */
+.cockpit-agent-card {
+  display: flex; flex-direction: column;
+  border-left: 3px solid var(--brass);
+}
+.cockpit-agent-card.agent-risk     { border-left-color: var(--danger); }
+.cockpit-agent-card.agent-billing  { border-left-color: var(--success); }
+.cockpit-agent-card.agent-complete { border-left-color: var(--ink-3); }
+.cockpit-agent-block { margin-bottom: 10px; }
+.cockpit-agent-label { font-size: 11px; color: var(--ink-3); margin-bottom: 4px; }
+.cockpit-agent-task { font-size: 13px; color: var(--ink-1); margin-bottom: 6px; }
+.cockpit-agent-bar { height: 6px; background: var(--line); border-radius: 3px; overflow: hidden; margin-bottom: 6px; }
+.cockpit-agent-bar-fill { height: 100%; border-radius: 3px; transition: width 0.3s; }
+.cockpit-agent-eta { font-size: 11px; color: var(--ink-3); }
+.cockpit-agent-list { font-size: 12px; color: var(--ink-2); line-height: 1.7; }
+.cockpit-agent-go {
+  width: 100%; height: 32px; margin-top: 12px; cursor: pointer;
+  border: 1px solid var(--line-2); background: var(--paper); border-radius: var(--r);
+  font-size: 12px; font-family: inherit; color: var(--ink-1); transition: all 0.2s;
+}
+.cockpit-agent-go:hover { border-color: var(--brass); color: var(--brass); }
+.cockpit-overview {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 12px 16px; background: var(--paper); border: 1px solid var(--line);
+  border-radius: var(--r-lg); margin-bottom: 14px;
+}
+.cockpit-overview-stats { display: flex; gap: 22px; font-size: 12px; color: var(--ink-2); }
+.cockpit-footer {
+  display: flex; gap: 16px; padding: 12px 16px; margin-top: 14px;
+  background: var(--paper); border: 1px solid var(--line);
+  border-radius: var(--r); font-size: 12px; color: var(--ink-2);
+}
+
+/* 数据看板的新区（卡片化，视觉权重从决策→预警→事件流递减） */
+.board-zone {
+  background: var(--paper); border: 1px solid var(--line);
+  border-radius: var(--r-lg); padding: 16px 20px; margin-bottom: 14px;
+}
+.board-zone.weight-high { border-left: 4px solid var(--danger); box-shadow: 0 2px 10px rgba(26,31,46,0.05); }
+.board-zone.weight-mid  { border-left: 3px solid var(--brass); }
+.board-zone-title { font-size: 14px; font-weight: 600; color: var(--ink-1); margin-bottom: 10px; }
+.board-two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+
+/* 数据看板的决策卡（沿用 R002 设计语言） */
+.dash-decision-card {
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px 16px; background: var(--canvas);
+  border: 1px solid var(--line); border-left: 3px solid var(--danger);
+  border-radius: var(--r); margin-bottom: 8px; cursor: pointer; transition: all 0.2s;
+}
+.dash-decision-card:hover { border-color: var(--brass); transform: translateY(-1px); }
+.dash-decision-card.priority-high { border-left-color: var(--danger); }
+.dash-decision-card.priority-mid  { border-left-color: var(--brass); }
+.dash-decision-card.priority-low  { border-left-color: var(--success); }
+
+/* 数据看板事件条目 */
+.dashboard-event-item {
+  display: flex; align-items: center; gap: 10px; padding: 7px 0;
+  border-bottom: 1px solid var(--line-2); font-size: 12px; color: var(--ink-1);
+}
+.dashboard-event-item:last-child { border-bottom: none; }
 </style>
 </head>
 <body>
@@ -995,50 +1058,29 @@
       <div class="view-panel" data-view-panel="agent-cockpit">
         <div class="cockpit-wrap">
 
-          <!-- 区 1：待我决策（视觉权重最高） -->
-          <div class="dash-card cockpit-decision-zone">
-            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-              <div>
-                <div class="decision-title">🎯 待我决策 <span class="decision-count" id="decision-count"></span></div>
-                <div class="decision-sub">AI 等待你拍板的工作 · 按优先级排序 · 点卡片查看依据</div>
-              </div>
-              <button class="btn-primary" data-action="approve-all" style="height: 32px; padding: 0 16px;">全部同意 →</button>
+          <!-- 顶部总览条 -->
+          <div class="cockpit-overview">
+            <div style="font-size: 14px; font-weight: 600; color: var(--ink-1);">📊 团队总览</div>
+            <div class="cockpit-overview-stats">
+              <span><b style="color: var(--success);">3</b> 在线</span>
+              <span><b style="color: var(--ink-1);">0</b> 异常</span>
+              <span><b style="color: var(--brass);">5</b> 任务运行中</span>
             </div>
-            <div id="decision-list"></div>
           </div>
 
-          <!-- 区 2：中部左右分栏 -->
-          <div class="cockpit-grid">
-
-            <!-- 左列：团队运行态 + 快捷调度 -->
-            <div class="cockpit-col">
-              <div class="dash-card">
-                <div class="card-header"><span>⚡ 智能体团队运行态</span><span style="font-size: 11px; font-weight: 400; color: var(--ink-3);">3 在线 · 0 异常</span></div>
-                <div id="agents-running"></div>
-              </div>
-              <div class="dash-card">
-                <div class="card-header"><span>🚀 快捷调度</span></div>
-                <div class="quick-actions" id="quick-actions"></div>
-              </div>
-            </div>
-
-            <!-- 右列：事件流 + 预警 + AI 洞察 -->
-            <div class="cockpit-col">
-              <div class="dash-card">
-                <div class="card-header"><span>📊 今日事件流</span></div>
-                <div id="today-events"></div>
-              </div>
-              <div class="dash-card">
-                <div class="card-header"><span>🚨 异常预警</span></div>
-                <div class="mini-list" id="alerts-list"></div>
-              </div>
-              <div class="dash-card">
-                <div class="card-header"><span>🤖 AI 智能洞察</span></div>
-                <div class="mini-list" id="insights-list"></div>
-              </div>
-            </div>
-
+          <!-- 3 列网格：智能体运行态 -->
+          <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px;">
+            <div id="cockpit-agents" style="display: contents;"></div>
           </div>
+
+          <!-- 底部统计条 -->
+          <div class="cockpit-footer">
+            <span>📅 今日完成</span>
+            <span>· <b style="color: var(--ink-1);">287</b> 张发票</span>
+            <span>· <b style="color: var(--danger);">5</b> 家风险预警</span>
+            <span>· <b style="color: var(--success);">18</b> 项主数据</span>
+          </div>
+
         </div>
       </div>
       <div class="view-panel" data-view-panel="agent-billing">
@@ -1249,6 +1291,38 @@
                 <div style="font-size: 10px; color: var(--brass); margin-top: 2px;">等你决定</div>
               </div>
             </div>
+          </div>
+
+          <!-- 区 2：🚨 待我决策（R003 从驾驶舱迁入） -->
+          <div class="board-zone weight-high">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+              <div>
+                <div class="board-zone-title" style="margin-bottom: 0;">🚨 待我决策 <span id="board-decision-count" style="color: var(--danger);"></span></div>
+                <div style="font-size: 11px; color: var(--ink-3); margin-top: 3px;">AI 等待你拍板的工作 · 按优先级排序 · 点卡片查看依据</div>
+              </div>
+              <button class="btn-primary" data-action="approve-all" style="height: 32px; padding: 0 16px;">全部同意 →</button>
+            </div>
+            <div id="board-decision-list" style="margin-top: 10px;"></div>
+          </div>
+
+          <!-- 区 3：🚨 异常预警 + 🤖 AI 智能洞察（R003 从驾驶舱迁入） -->
+          <div class="board-zone weight-mid">
+            <div class="board-two-col">
+              <div>
+                <div class="board-zone-title">🚨 异常预警</div>
+                <div class="mini-list" id="board-alerts"></div>
+              </div>
+              <div>
+                <div class="board-zone-title">🤖 AI 智能洞察</div>
+                <div class="mini-list" id="board-insights"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 区 4：📊 今日事件流（R003 从驾驶舱迁入） -->
+          <div class="board-zone">
+            <div class="board-zone-title">📊 今日事件流</div>
+            <div id="board-events"></div>
           </div>
 
           <!-- 区 2：客户信息补全 -->
@@ -2524,9 +2598,24 @@ document.querySelectorAll('.dashboard-tabs').forEach(bar => {
 Object.keys(AGENT_CHAT).forEach(renderChat);
 
 
-// ============ R002：智能体驾驶舱 v2（决策优先） ============
-// 约束：整个 cockpit 不出现任何金额（¥ / 万元 / 亿元）
+// ============ R003：驾驶舱聚焦运行态 + 数据看板扩展 ============
+// 约束：agent-cockpit 只放运行态（无「待我决策 / 异常预警 / 事件流」，无金额）
+//       决策类内容统一放在 data-board，两处不重复
 
+// —— 驾驶舱：3 个智能体运行态 ——
+const COCKPIT_AGENTS = [
+  { key: 'agent-risk', icon: '⚠️', name: '风险预警官', task: '集团风险扫描',
+    detail: '扫描 234 / 350 家', progress: 67, eta: 'ETA 16:00', color: 'var(--danger)',
+    done: ['触发 5 家高风险预警', '生成风险周报（草稿）'], todo: ['116 家剩余'], go: 'agent-risk' },
+  { key: 'agent-billing', icon: '⚡', name: '智能开票专员', task: '自动开票',
+    detail: '已开 287 / 320 张', progress: 89, eta: 'ETA 18:30', color: 'var(--success)',
+    done: ['已开 287 张发票', '拦截 3 张异常票'], todo: ['33 张剩余'], go: 'agent-billing' },
+  { key: 'agent-complete', icon: '🔧', name: '客户补全专员', task: '主数据补全',
+    detail: '18 / 23 项已补全', progress: 78, eta: '待你拍板', color: 'var(--brass)',
+    done: ['18 项主数据已补全'], todo: ['5 家待确认'], go: 'tool-mgr' }
+];
+
+// —— 数据看板：决策 / 预警 / 事件流（R003 从驾驶舱迁入）——
 const DECISIONS = [
   { id: 'dec-1', priority: 'high', agentIcon: '🚨', title: '苏州金鹏 · 税务非正常户',
     impact: '若继续开票，进项转出风险严重', suggestion: '立即停止开票 + 启动法务催收',
@@ -2542,17 +2631,11 @@ const DECISIONS = [
     time: '14:32', eventId: 'event-3' }
 ];
 
-const AGENTS_RUNNING = [
-  { id: 'agent-risk',     icon: '⚠', name: '风险预警官',   task: '集团风险扫描', progress: 67, eta: 'ETA 16:00', color: 'var(--brass)' },
-  { id: 'agent-billing',  icon: '⚡', name: '智能开票专员', task: '自动开票',     progress: 89, eta: 'ETA 18:30', color: 'var(--success)' },
-  { id: 'agent-complete', icon: '🔧', name: '客户补全专员', task: '待确认',       progress: 0,  eta: '待你拍板',  color: 'var(--line-2)' }
-];
-
 const TODAY_EVENTS = [
-  { time: '14:32', company: '上海永胜', text: '主数据补全完成',   status: 'done' },
-  { time: '11:45', company: '苏州金鹏', text: '触发风险拦截',     status: 'paused' },
-  { time: '10:21', company: '5 家批量', text: '主数据批量补全',   status: 'done' },
-  { time: '09:15', company: '月初盘点', text: '认证率盘点完成',   status: 'done' }
+  { time: '14:32', company: '上海永胜', text: '主数据补全完成', status: 'done' },
+  { time: '11:45', company: '苏州金鹏', text: '触发风险拦截',   status: 'paused' },
+  { time: '10:21', company: '5 家批量', text: '主数据批量补全', status: 'done' },
+  { time: '09:15', company: '月初盘点', text: '认证率盘点完成', status: 'done' }
 ];
 
 const ALERTS = [
@@ -2567,9 +2650,6 @@ const INSIGHTS = [
   { icon: '⚡', text: '自动开票效率 +12%' }
 ];
 
-const QUICK_ACTIONS = ['⚡ 一键风险扫描', '🌅 智能体晨报', '📋 集团风控报告',
-                       '🔍 全量客户盘点', '📊 月度合规报告', '📤 批量补全'];
-
 const STATUS_ICON = { done: '✓', paused: '⏸', warn: '⚠' };
 const PRIORITY_LABEL = { high: '高', mid: '中', low: '低' };
 
@@ -2582,9 +2662,36 @@ function showToast(msg) {
   t._timer = setTimeout(() => t.classList.remove('show'), 1800);
 }
 
+// —— 驾驶舱渲染（纯运行态）——
+function renderCockpitAgents() {
+  const box = document.getElementById('cockpit-agents');
+  if (!box) return;
+  box.innerHTML = COCKPIT_AGENTS.map(a =>
+    '<div class="dash-card cockpit-agent-card ' + a.key + '">'
+    + '<div class="card-header">' + a.icon + ' ' + a.name + '</div>'
+    + '<div style="font-size: 11px; color: var(--ink-3); margin-bottom: 10px;">' + a.task + '</div>'
+    + '<div class="cockpit-agent-block">'
+    +   '<div class="cockpit-agent-label">当前任务</div>'
+    +   '<div class="cockpit-agent-task">' + a.detail + ' · 进度 ' + a.progress + '%</div>'
+    +   '<div class="cockpit-agent-bar"><div class="cockpit-agent-bar-fill" style="width: ' + a.progress + '%; background: ' + a.color + ';"></div></div>'
+    +   '<div class="cockpit-agent-eta">' + a.eta + '</div>'
+    + '</div>'
+    + '<div class="cockpit-agent-block">'
+    +   '<div class="cockpit-agent-label">已完成</div>'
+    +   '<div class="cockpit-agent-list">' + a.done.map(t => '<div>✓ ' + t + '</div>').join('') + '</div>'
+    + '</div>'
+    + '<div class="cockpit-agent-block">'
+    +   '<div class="cockpit-agent-label">待执行</div>'
+    +   '<div class="cockpit-agent-list">' + a.todo.map(t => '<div>⏸ ' + t + '</div>').join('') + '</div>'
+    + '</div>'
+    + '<button class="cockpit-agent-go" data-go="' + a.go + '">' + a.icon + ' 进入' + a.name + ' →</button>'
+    + '</div>').join('');
+}
+
+// —— 数据看板渲染 ——
 function renderDecisions() {
-  const box = document.getElementById('decision-list');
-  const cnt = document.getElementById('decision-count');
+  const box = document.getElementById('board-decision-list');
+  const cnt = document.getElementById('board-decision-count');
   if (!box) return;
   const left = DECISIONS.filter(d => !d.done);
   if (cnt) cnt.textContent = '· ' + left.length + ' 单';
@@ -2593,7 +2700,7 @@ function renderDecisions() {
     return;
   }
   box.innerHTML = left.map(d =>
-    '<div class="decision-card priority-' + d.priority + '" data-id="' + d.id + '">'
+    '<div class="dash-decision-card priority-' + d.priority + '" data-id="' + d.id + '">'
     + '<span class="decision-tag priority-' + d.priority + '">' + PRIORITY_LABEL[d.priority] + '</span>'
     + '<div class="decision-card-main">'
     +   '<div class="decision-card-title">' + d.agentIcon + ' ' + d.title + '</div>'
@@ -2605,24 +2712,11 @@ function renderDecisions() {
     + '</div>').join('');
 }
 
-function renderAgentsRunning() {
-  const box = document.getElementById('agents-running');
-  if (!box) return;
-  box.innerHTML = AGENTS_RUNNING.map(a =>
-    '<div class="agent-progress-row">'
-    + '<span class="agent-progress-name">' + a.icon + ' ' + a.name + '</span>'
-    + '<span class="agent-progress-task">' + a.task + '</span>'
-    + '<span class="agent-progress-bar-mini"><span class="agent-progress-bar-fill" style="width: ' + a.progress + '%; background: ' + a.color + ';"></span></span>'
-    + '<span class="agent-progress-pct">' + a.progress + '%</span>'
-    + '<span class="agent-progress-eta">' + a.eta + '</span>'
-    + '</div>').join('');
-}
-
-function renderTodayEvents() {
-  const box = document.getElementById('today-events');
+function renderBoardEvents() {
+  const box = document.getElementById('board-events');
   if (!box) return;
   box.innerHTML = TODAY_EVENTS.map(e =>
-    '<div class="event-item">'
+    '<div class="dashboard-event-item">'
     + '<span class="event-time">' + e.time + '</span>'
     + '<span class="event-company">' + e.company + ' · ' + e.text + '</span>'
     + '<span class="event-status ' + e.status + '">' + (STATUS_ICON[e.status] || '') + '</span>'
@@ -2637,23 +2731,25 @@ function renderMiniList(id, items) {
     + '<span class="ico">' + a.icon + '</span><span>' + a.text + '</span></div>').join('');
 }
 
-function renderQuickActions() {
-  const box = document.getElementById('quick-actions');
-  if (!box) return;
-  box.innerHTML = QUICK_ACTIONS.map(t => '<button type="button">' + t + '</button>').join('');
-}
-
 // —— 交互绑定 ——
 function bindCockpit() {
-  const list = document.getElementById('decision-list');
+  const box = document.getElementById('cockpit-agents');
+  if (!box) return;
+  box.addEventListener('click', e => {
+    const btn = e.target.closest('button[data-go]');
+    if (btn) switchView(btn.dataset.go);
+  });
+}
+
+function bindBoard() {
+  const list = document.getElementById('board-decision-list');
   if (list) {
     list.addEventListener('click', e => {
       const btn = e.target.closest('button[data-act]');
-      const card = e.target.closest('.decision-card');
+      const card = e.target.closest('.dash-decision-card');
       const id = (btn && btn.dataset.id) || (card && card.dataset.id);
       const d = DECISIONS.find(x => x.id === id);
       if (!d) return;
-
       if (btn) {
         e.stopPropagation();
         if (btn.dataset.act === 'detail') {
@@ -2666,7 +2762,6 @@ function bindCockpit() {
         renderDecisions();
         return;
       }
-      // 点卡片本体 → 打开依据
       if (d.eventId && EVIDENCE[d.eventId]) openModal(d.eventId);
     });
   }
@@ -2681,24 +2776,17 @@ function bindCockpit() {
       renderDecisions();
     });
   }
-
-  const qa = document.getElementById('quick-actions');
-  if (qa) {
-    qa.addEventListener('click', e => {
-      const b = e.target.closest('button');
-      if (b) showToast('已启动：' + b.textContent.trim());
-    });
-  }
 }
 
+// —— 初始化 ——
+renderCockpitAgents();
 renderDecisions();
-renderAgentsRunning();
-renderTodayEvents();
-renderMiniList('alerts-list', ALERTS);
-renderMiniList('insights-list', INSIGHTS);
-renderQuickActions();
+renderBoardEvents();
+renderMiniList('board-alerts', ALERTS);
+renderMiniList('board-insights', INSIGHTS);
 bindCockpit();
+bindBoard();
 
-</script></script>
+</script>
 
 </body></html>
